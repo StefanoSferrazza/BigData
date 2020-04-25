@@ -3,18 +3,18 @@ package hadoop.job1;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDate;
 
 import org.apache.hadoop.io.Text;
 
 public class Job1Reducer extends Reducer<Text, Job1Tuple, Text, Job1Result>{
 
-	public void Reduce(Text key, Iterable<Job1Tuple> values, Context context) throws IOException, InterruptedException {
+	public void reduce(Text key, Iterable<Job1Tuple> values, Context context) throws IOException, InterruptedException {
 		//declaration and dummy initialization, will be overwritten when sees first value
 		float actualInitialCloseValue = 0;					//to calculate final percentageChange
 		float actualFinalCloseValue = 0;					//to calculate final percentageChange
-		Date actualMinDate = new Date();					//to take correct initialCloseValue (first close in time)
-		Date actualMaxDate = new Date();					//to take correct finalCloseValue (last close in time)
+		LocalDate actualMinDate = LocalDate.now();			//to take correct initialCloseValue (first close in time)
+		LocalDate actualMaxDate = LocalDate.now();			//to take correct finalCloseValue (last close in time)
 		float actualMinPrice = 999999999;		
 		float actualMaxPrice = 0;				
 		float counterTuples = 0;							//to calculate avg of volumes
@@ -28,23 +28,23 @@ public class Job1Reducer extends Reducer<Text, Job1Tuple, Text, Job1Result>{
 				actualFinalCloseValue = t.getClose();
 				actualMinDate = t.getDate();
 				actualMaxDate = t.getDate();
-				actualMinPrice = t.getMin();
-				actualMaxPrice = t.getMax();
+				actualMinPrice = t.getLow();
+				actualMaxPrice = t.getHigh();
 				valuesInitialized = true;
 			}
-			if(actualMinDate.after(t.getDate())) {			//update initialCloseValue if current tuple date is lower
+			if(actualMinDate.isAfter(t.getDate())) {			//update initialCloseValue if current tuple date is lower
 				actualMinDate = t.getDate();
 				actualInitialCloseValue = t.getClose();
 			}
-			if(actualMaxDate.before(t.getDate())) {			//update initialCloseValue if current tuple date is greater
+			if(actualMaxDate.isBefore(t.getDate())) {			//update initialCloseValue if current tuple date is greater
 				actualMaxDate = t.getDate();
 				actualFinalCloseValue = t.getClose();
 			}
-			if(t.getMin()<actualMinPrice) {					//if current tuple min value is lower, update min value
-				actualMinPrice = t.getMin();
+			if(t.getLow()<actualMinPrice) {					//if current tuple min value is lower, update min value
+				actualMinPrice = t.getLow();
 			}
-			if(t.getMax()<actualMaxPrice) {					//if current tuple max value is greater, update max value
-				actualMaxPrice = t.getMax();
+			if(t.getHigh()<actualMaxPrice) {					//if current tuple max value is greater, update max value
+				actualMaxPrice = t.getHigh();
 			}
 			counterTuples++;									
 			sumVolumes += t.getVolume();

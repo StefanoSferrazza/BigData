@@ -1,32 +1,32 @@
 package hadoop.job1;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Job1Tuple {
 
-	private Date date;
+	private LocalDate date;
 	
 	private float close;
 	
-	private float min;
+	private float low;
 	
-	private float max;
+	private float high;
 	
 	private float volume;
 
-	public Job1Tuple(Date date, float close, float min, float max, float volume) {
+	public Job1Tuple(LocalDate date, float close, float low, float high, float volume) {
 		this.date = date;
 		this.close = close;
-		this.min = min;
-		this.max = max;
+		this.low = low;
+		this.high = high;
 		this.volume = volume;
 	}
 
-	public Date getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(Date date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
@@ -38,20 +38,20 @@ public class Job1Tuple {
 		this.close = close;
 	}
 
-	public float getMin() {
-		return min;
+	public float getLow() {
+		return low;
 	}
 
-	public void setMin(float min) {
-		this.min = min;
+	public void setLow(float low) {
+		this.low = low;
 	}
 
-	public float getMax() {
-		return max;
+	public float getHigh() {
+		return high;
 	}
 
-	public void setMax(float max) {
-		this.max = max;
+	public void setHigh(float high) {
+		this.high = high;
 	}
 
 	public float getVolume() {
