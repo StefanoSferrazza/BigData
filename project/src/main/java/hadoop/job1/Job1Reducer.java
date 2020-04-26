@@ -7,9 +7,9 @@ import java.time.LocalDate;
 
 import org.apache.hadoop.io.Text;
 
-public class Job1Reducer extends Reducer<Text, Job1Tuple, Text, Job1Result>{
+public class Job1Reducer extends Reducer<Text, Job1TupleWritable, Text, Job1ResultWritable>{
 
-	public void reduce(Text key, Iterable<Job1Tuple> values, Context context) throws IOException, InterruptedException {
+	public void reduce(Text key, Iterable<Job1TupleWritable> values, Context context) throws IOException, InterruptedException {
 		//declaration and dummy initialization, will be overwritten when sees first value
 		float actualInitialCloseValue = 0;					//to calculate final percentageChange
 		float actualFinalCloseValue = 0;					//to calculate final percentageChange
@@ -22,7 +22,7 @@ public class Job1Reducer extends Reducer<Text, Job1Tuple, Text, Job1Result>{
 		boolean valuesInitialized = false;					//to initialize on first iteration
 
 
-		for(Job1Tuple t : values) {
+		for(Job1TupleWritable t : values) {
 			if(!valuesInitialized) {						//initialization
 				actualInitialCloseValue = t.getClose();
 				actualFinalCloseValue = t.getClose();
@@ -54,7 +54,7 @@ public class Job1Reducer extends Reducer<Text, Job1Tuple, Text, Job1Result>{
 
 		float avgVolume = sumVolumes / counterTuples;
 		
-		Job1Result result = new Job1Result(percentageChange, actualMinPrice, actualMaxPrice, avgVolume);
+		Job1ResultWritable result = new Job1ResultWritable(percentageChange, actualMinPrice, actualMaxPrice, avgVolume);
 		
 		context.write(key, result);
 	}
