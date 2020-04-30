@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class Job2JoinReducer extends Reducer<Text, Text, Text, Text>{
+public class JoinReducer extends Reducer<Text, Text, Text, Text>{
 	
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HS = "historical_stock";

@@ -8,7 +8,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
-public class Job2HistoricalStockPricesMapper extends Mapper<LongWritable, Text, Text, Text>{
+public class JoinHistoricalStockPricesMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HSP = "historical_stock_prices";
