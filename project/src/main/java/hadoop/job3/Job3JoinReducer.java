@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.hadoop.io.FloatWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -16,11 +15,12 @@ import org.apache.hadoop.mapreduce.Reducer;
  * 
  *
  */
-public class Job3JoinReducer extends Reducer<Text, Text, Text, FloatWritable>{
+public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HSP = "hsp";
 	private static final String SEPARATOR_HS = "hs";
+	private static final String COLON = ":";
 
 
 	/**
@@ -37,16 +37,24 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, FloatWritable>{
 			this.year = year;
 		}
 
-		public boolean equals(Pair pair) {
+		
+		@Override
+		public boolean equals(Object obj) {
+			Pair pair = (Pair) obj;
 			return this.companyName.equals(pair.companyName) &&
 					this.year.equals(pair.year);
+		}
+		
+		@Override
+		public int hashCode() {
+			return this.companyName.hashCode() + this.year.hashCode();
 		}
 	}
 
 
 	private Map<Pair, Float> companyYearStartQuotation;
 	private Map<Pair, Float> companyYearEndQuotation;
-	private Map<Pair, Float> companyYearAnnualVariation;
+	private Map<String, String> companyAnnualVariations;
 
 
 	@Override
@@ -54,6 +62,7 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, FloatWritable>{
 		// 		super.setup(context); 										?????????????
 		this.companyYearStartQuotation = new HashMap<Pair, Float>();
 		this.companyYearEndQuotation = new HashMap<Pair, Float>();
+		this.companyAnnualVariations = new HashMap<String, String>();
 	}
 
 
@@ -104,7 +113,7 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, FloatWritable>{
 		for(Integer year : actionYearFirstClose.keySet()) {
 			float actionFirstClose = actionYearFirstClose.get(year);
 			float actionLastClose = actionYearLastClose.get(year);
-			
+
 			Pair companyYearStartCloses = new Pair(companyName,year);
 			Float startCloses = companyYearStartQuotation.get(companyYearStartCloses);
 			if(startCloses != null)
@@ -134,8 +143,21 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, FloatWritable>{
 
 			float companyAnnualVariation = ((companyYearEndQuotation - companyYearStartQuotation)
 					/companyYearStartQuotation)*100;
+			
+			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CONVERT INTO INTEGER
 
-			this.companyYearAnnualVariation.put(companyYear, companyAnnualVariation);
+			
+			String annualVariations = this.companyAnnualVariations.get(companyYear.companyName);
+			if(annualVariations != null)
+				annualVariations += COMMA + companyYear.year + COLON + companyAnnualVariation;
+			else
+				annualVariations = companyYear.year + COLON + companyAnnualVariation + "%";
+			this.companyAnnualVariations.put(companyYear.companyName, annualVariations);
+		}
+		
+		for(String companyName : this.companyAnnualVariations.keySet()) {	
+			context.write(new Text(companyName),
+					new Text(this.companyAnnualVariations.get(companyName)));	
 		}
 	}
 
