@@ -2,8 +2,10 @@ package hadoop.job3;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -28,7 +30,7 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 	 * 
 	 *
 	 */
-	private class Pair {
+	private class Pair implements Comparable<Pair>{
 		public String companyName;
 		public Integer year;
 
@@ -49,7 +51,20 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 		public int hashCode() {
 			return this.companyName.hashCode() + this.year.hashCode();
 		}
+
+
+		public int compareTo(Pair p) {										// !!!!!!!!!!!!!!!! DO BETTER 
+																			// with COMPARATOR
+			int i = companyName.compareTo(p.companyName);
+		    if (i != 0) 
+		    	return i;
+		    return Integer.compare(year, p.year);
+		}
 	}
+	
+	
+	
+	
 
 
 	private Map<Pair, Float> companyYearStartQuotation;
@@ -60,8 +75,8 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 	@Override
 	protected void setup(Context context) {
 		// 		super.setup(context); 										?????????????
-		this.companyYearStartQuotation = new HashMap<Pair, Float>();
-		this.companyYearEndQuotation = new HashMap<Pair, Float>();
+		this.companyYearStartQuotation = new TreeMap<Pair, Float>();
+		this.companyYearEndQuotation = new TreeMap<Pair, Float>();
 		this.companyAnnualVariations = new HashMap<String, String>();
 	}
 
@@ -141,15 +156,18 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 			float companyYearStartQuotation = this.companyYearStartQuotation.get(companyYear);
 			float companyYearEndQuotation = this.companyYearEndQuotation.get(companyYear);
 
-			float companyAnnualVariation = ((companyYearEndQuotation - companyYearStartQuotation)
-					/companyYearStartQuotation)*100;
-			
+			int companyAnnualVariation = (int) (((companyYearEndQuotation - companyYearStartQuotation)
+					/companyYearStartQuotation)*100);
+
+
+
 			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CONVERT INTO INTEGER
 
-			
+
+
 			String annualVariations = this.companyAnnualVariations.get(companyYear.companyName);
 			if(annualVariations != null)
-				annualVariations += COMMA + companyYear.year + COLON + companyAnnualVariation;
+				annualVariations += COMMA + companyYear.year + COLON + companyAnnualVariation + "%";
 			else
 				annualVariations = companyYear.year + COLON + companyAnnualVariation + "%";
 			this.companyAnnualVariations.put(companyYear.companyName, annualVariations);
