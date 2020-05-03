@@ -10,12 +10,11 @@ import org.apache.hadoop.mapreduce.Reducer.Context;
 public class Job2Reducer extends Reducer<Text,Text,Text,Text>{
 
 	private static final String COMMA = ",";
-	private static final String COMMA_SPACE = COMMA + " ";
 	private static final String TAB = "\t";
 	
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
-		context.write(new Text("SETTORE" + COMMA_SPACE + "ANNO" + TAB + TAB), new Text("VOLUME_ANNUALE_MEDIO" + COMMA_SPACE + "VARIAZIONE_ANNUALE_MEDIA_%" + COMMA_SPACE + "QUOTAZIONE_GIORNALIERA_MEDIA"));
+		context.write(new Text("SETTORE" + COMMA + "ANNO"), new Text("VOLUME_ANNUALE_MEDIO" + COMMA + "VARIAZIONE_ANNUALE_MEDIA_%" + COMMA + "QUOTAZIONE_GIORNALIERA_MEDIA"));
 	}
 	
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
@@ -59,7 +58,7 @@ public class Job2Reducer extends Reducer<Text,Text,Text,Text>{
 			String[] keys = key.toString().split(COMMA);
 			
 			//("SETTORE, ANNO"), ("VOLUME_ANNUALE_MEDIO,VARIAZIONE_ANNUALE_MEDIA,QUOTAZIONE_GIORNALIERA_MEDIA"));
-			context.write(new Text(keys[0] + COMMA_SPACE + keys[1] + TAB + TAB), new Text(avgSumVolume + COMMA_SPACE + avgYearVar + "%" + COMMA_SPACE + avgDailyClose));
+			context.write(new Text(keys[0] + COMMA + keys[1]), new Text(avgSumVolume + COMMA + avgYearVar + "%" + COMMA + avgDailyClose));
 		}
 		catch(Exception e) {
 			e.printStackTrace();
