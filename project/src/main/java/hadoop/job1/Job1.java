@@ -25,9 +25,9 @@ public class Job1 {
 		FileOutputFormat.setOutputPath(job, new Path(args[1]));
 		
 		job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Job1TupleWritable.class);
+        job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Job1ResultWritable.class);
+        job.setOutputValueClass(Text.class);
         job.setOutputFormatClass(TextOutputFormat.class);
 
 		job.waitForCompletion(true);
