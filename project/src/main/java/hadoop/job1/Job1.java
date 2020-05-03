@@ -1,6 +1,8 @@
 package hadoop.job1;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -13,6 +15,8 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 public class Job1 {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
+		
+		Instant start = Instant.now();
 		
 		@SuppressWarnings("deprecation")
 		Job job = new Job(new Configuration(), "Job1");
@@ -31,5 +35,8 @@ public class Job1 {
         job.setOutputFormatClass(TextOutputFormat.class);
 
 		job.waitForCompletion(true);
+		
+		Instant finish = Instant.now();
+		System.out.println("COMPUTING TIME: " + Duration.between(start, finish));
 	}
 }

@@ -1,5 +1,8 @@
 package hadoop.job3;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -29,6 +32,8 @@ import hadoop.job1.Job1TupleWritable;
 public class Job3 extends Configured implements Tool{
 
 	public int run(String[] args) throws Exception {
+		
+		Instant start = Instant.now();
 		
 		Path temp = new Path("temp");
 		Path inputHSP = new Path(args[0]);
@@ -79,6 +84,10 @@ public class Job3 extends Configured implements Tool{
 			System.out.println("Job3 failed, exiting");
 			return -1;
 		}
+		
+		Instant finish = Instant.now();
+		System.out.println("COMPUTING TIME: " + Duration.between(start, finish));
+		
 		return 0;
 	}
 

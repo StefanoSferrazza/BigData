@@ -1,5 +1,8 @@
 package hadoop.job2;
 
+import java.time.Duration;
+import java.time.Instant;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
@@ -17,6 +20,9 @@ import org.apache.hadoop.util.ToolRunner;
 
 public class Job2 extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
+		
+		Instant start = Instant.now();
+		
 		/*PATHS*/
 		Path inputHS = new Path(args[0]);
 		Path inputHSP = new Path(args[1]);
@@ -69,6 +75,9 @@ public class Job2 extends Configured implements Tool{
 			System.out.println("Job2 failed, exiting");
 			return -1;
 		}
+		
+		Instant finish = Instant.now();
+		System.out.println("COMPUTING TIME: " + Duration.between(start, finish));
 		
 		return 0;
 	}
