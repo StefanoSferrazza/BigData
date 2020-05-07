@@ -7,6 +7,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
+import utilities.Utilities;
+
 public class JoinHistoricalStocksMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 		private static final String COMMA = ",";
@@ -22,11 +24,11 @@ public class JoinHistoricalStocksMapper extends Mapper<LongWritable, Text, Text,
 					String[] tokens = line.split(COMMA);
 					
 								
-					if(tokens.length==5 &&
-							!(tokens[0].equals(null) || tokens[0].equals("") || tokens[0].equals("N/A")) &&
-							!(tokens[3].equals(null) || tokens[3].equals("") || tokens[3].equals("N/A")) ) {
-						//<ticker, (historical_stock,sector)>
+					if(tokens.length==5	&&
+		        			Utilities.inputExists(tokens[0]) &&
+		        			Utilities.inputExists(tokens[3]) ) {
 						
+						//<ticker, (historical_stock,sector)>						
 						context.write(new Text(tokens[0]), new Text(SEPARATOR_HS + COMMA + tokens[3]));
 					}
 				}

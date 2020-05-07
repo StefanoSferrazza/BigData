@@ -6,6 +6,8 @@ import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import utilities.Utilities;
+
 
 /**
  * 
@@ -27,8 +29,11 @@ public class Job3HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 			else {
 				String line = value.toString();
 				String[] tokens = line.split(COMMA);
-				
-				if(tokens.length==5) {
+
+				if(tokens.length==5	&&						
+						Utilities.inputExists(tokens[0]) &&
+						Utilities.inputExists(tokens[2])
+						) {
 					context.write(new Text(tokens[0]), new Text(SEPARATOR_HS + COMMA + tokens[2]));
 				}
 			}
@@ -37,6 +42,6 @@ public class Job3HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 			return;
 		}
 	}
-	
+
 
 }

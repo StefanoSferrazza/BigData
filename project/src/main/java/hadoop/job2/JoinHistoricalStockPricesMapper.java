@@ -8,6 +8,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
+import utilities.Utilities;
+
 public class JoinHistoricalStockPricesMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";
@@ -26,13 +28,13 @@ public class JoinHistoricalStockPricesMapper extends Mapper<LongWritable, Text, 
 
 				
 				if(date.getYear()>=2008 && date.getYear()<=2018) {
-					if(tokens.length==8 &&
-							!(tokens[0].equals(null) || tokens[0].equals("") || tokens[0].equals("N/A")) &&
-							!(tokens[2].equals(null) || tokens[2].equals("") || tokens[2].equals("N/A")) &&
-							!(tokens[6].equals(null) || tokens[6].equals("") || tokens[6].equals("N/A")) &&
-							!(tokens[7].equals(null) || tokens[7].equals("") || tokens[7].equals("N/A")) ) {
-						//	<ticker, (historical_stock_prices,close,volume,date)>
+					if(tokens.length==8  &&
+	        				Utilities.inputExists(tokens[0]) &&
+	        				Utilities.inputExists(tokens[2]) &&
+	        				Utilities.inputExists(tokens[6]) &&
+	        				Utilities.inputExists(tokens[7]) ) {
 						
+						//	<ticker, (historical_stock_prices,close,volume,date)>
 						context.write(new Text(tokens[0]), new Text(SEPARATOR_HSP + COMMA + tokens[2] + COMMA + tokens[6] + COMMA + tokens[7]));
 					}
 				}
