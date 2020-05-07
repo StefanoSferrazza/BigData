@@ -73,37 +73,35 @@ public class Job1Reducer extends Reducer<Text, Text, Text, Text>{
 			counterTuples++;									
 			sumVolumes += volume;
 		}
-		
+
 		Utilities u = new Utilities();
-		
+
 		float percentageChange = ((actualFinalCloseValue - actualInitialCloseValue) / actualInitialCloseValue)*100;
 
 		long avgVolume = sumVolumes/counterTuples;
-		
+
 		percentageChange = u.truncateToSecondDecimal(percentageChange);
-		minPrice = u.truncateToSecondDecimal(minPrice);
-		maxPrice = u.truncateToSecondDecimal(maxPrice);
-		
+		//		minPrice = u.truncateToSecondDecimal(minPrice);
+		//		maxPrice = u.truncateToSecondDecimal(maxPrice);
+
 		String ticker = key.toString();
-		
+
 		results.add(new Result(ticker,percentageChange,minPrice,maxPrice,avgVolume));
-		
-//		context.write(ticker, new Text(percentageChange + COMMA + actualMinPrice + COMMA + actualMaxPrice + COMMA + avgVolume));
 	}
-	
+
 	@Override
 	protected void cleanup(Context context) throws IOException, InterruptedException{
 		Collections.sort(results);
 		for(Result r : results) {
 			context.write(	new Text(	r.getTicker()), 
-							new Text(	r.getPercentageChange() + COMMA + 
-										r.getMinPrice() + COMMA + 
-										r.getMaxPrice() + COMMA + 
-										r.getAvgVolume()));
+					new Text(	r.getPercentageChange() + COMMA + 
+							r.getMinPrice() + COMMA + 
+							r.getMaxPrice() + COMMA + 
+							r.getAvgVolume()));
 		}
 	}
-	
-	
+
+
 	private class Result implements Comparable<Result>{
 
 		private String ticker;
