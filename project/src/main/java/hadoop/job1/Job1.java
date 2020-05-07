@@ -37,6 +37,6 @@ public class Job1 {
 		job.waitForCompletion(true);
 		
 		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish));
+		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
 	}
 }

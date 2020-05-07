@@ -86,7 +86,7 @@ public class Job3 extends Configured implements Tool{
 		}
 		
 		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish));
+		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
 		
 		return 0;
 	}
