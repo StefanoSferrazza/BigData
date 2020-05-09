@@ -74,13 +74,11 @@ public class Job1Reducer extends Reducer<Text, Text, Text, Text>{
 			sumVolumes += volume;
 		}
 
-		Utilities u = new Utilities();
-
 		float percentageChange = ((actualFinalCloseValue - actualInitialCloseValue) / actualInitialCloseValue)*100;
 
 		long avgVolume = sumVolumes/counterTuples;
 
-		percentageChange = u.truncateToSecondDecimal(percentageChange);
+		percentageChange = Utilities.truncateToSecondDecimal(percentageChange);
 		//		minPrice = u.truncateToSecondDecimal(minPrice);
 		//		maxPrice = u.truncateToSecondDecimal(maxPrice);
 
