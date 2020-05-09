@@ -20,7 +20,7 @@ public class DeltaQuotation  extends GenericUDF {
 	StringObjectInspector outputOI;
 
 	@Override
-	public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {
+	public ObjectInspector initialize(ObjectInspector[] arguments) throws UDFArgumentException {		//controlla correttezza input ed in caso contrario fallisce
 		assert (arguments.length == 2);
 		assert(arguments[0].getCategory() == Category.PRIMITIVE);
 		assert(arguments[1].getCategory() == Category.PRIMITIVE);
@@ -37,6 +37,9 @@ public class DeltaQuotation  extends GenericUDF {
 
 
 
+	/**
+	 * metodo principale
+	 */
 	@Override
 	public Object evaluate(DeferredObject[] arguments) throws HiveException {
 		if (arguments.length != 2) return null;
