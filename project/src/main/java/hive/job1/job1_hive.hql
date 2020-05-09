@@ -2,11 +2,11 @@ DROP TABLE if exists historical_stock_prices;
 
 CREATE TABLE historical_stock_prices (
         ticker STRING,
-        open DECIMAL,
-        close DECIMAL,
-        adj_close DECIMAL,
-        low_the DECIMAL,
-        high_the DECIMAL,
+        open FLOAT,
+        close FLOAT,
+        adj_close FLOAT,
+        low_the FLOAT,
+        high_the FLOAT,
         volume BIGINT,
         date_ticker DATE)
     ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
