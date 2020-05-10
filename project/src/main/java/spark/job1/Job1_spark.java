@@ -1,11 +1,11 @@
 package spark.job1;
 
+import java.io.FileWriter;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -14,9 +14,8 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.SparkSession;
 
 import scala.Tuple2;
-import scala.Tuple3;
-import scala.Tuple7;
 import scala.Tuple8;
+import utilities.Result_Job1;
 import utilities.Utilities;
 
 public class Job1_spark {
@@ -25,13 +24,19 @@ public class Job1_spark {
 
 	public static void main(String[] args) throws Exception {
 
-		//	    if (args.length < 1) {
-		//	      System.err.println("Usage: JavaWordCount <file>");
-		//	      System.exit(1);
-		//	    }
+		if (args.length!=2) {
+			System.err.println("Usage: ./bin/spark-submit --class spark.job1.Job1_spark jar_path input_path output_path");
+			System.exit(1);
+		}
+		
+		String inputPath = args[0];
+		String outputPath = args[1];
 
-		String path= "/home/bigdata/Documenti/bigData/progetto/daily-historical-stock-prices-1970-2018/historical_stock_prices.csv";
+//		String inputPath= "/home/bigdata/Documenti/bigData/progetto/daily-historical-stock-prices-1970-2018/historical_stock_prices.csv";
+//		String outputPath = "/home/bigdata/Scrivania/prova/prova.csv";
 
+		Instant start = Instant.now();
+		
 		// Spark Session creation
 
 		SparkSession spark = SparkSession
@@ -40,22 +45,27 @@ public class Job1_spark {
 				.getOrCreate();
 
 		// Import and Map Creation
-		JavaRDD<String> lines = spark.read().textFile(path).javaRDD();
+		JavaRDD<String> lines = spark.read().textFile(inputPath).javaRDD();
 
 
 		Function<String,Boolean> checkLine = s ->	{
-														String[] tokens = s.split(COMMA);
-														if(tokens.length==8 &&
-																Utilities.inputExists(tokens[0]) &&
-																Utilities.inputExists(tokens[2]) &&
-																Utilities.inputExists(tokens[6]) &&
-																Utilities.inputExists(tokens[7])) {
-															LocalDate date = LocalDate.parse(tokens[7]);
-															if(date.getYear()>=2008 && date.getYear()<=2018 ) {
-																return true;
+														try {
+															String[] tokens = s.split(COMMA);
+															if(tokens.length==8 &&
+																	Utilities.inputExists(tokens[0]) &&
+																	Utilities.inputExists(tokens[2]) &&
+																	Utilities.inputExists(tokens[6]) &&
+																	Utilities.inputExists(tokens[7])) {
+																LocalDate date = LocalDate.parse(tokens[7]);
+																if(date.getYear()>=2008 && date.getYear()<=2018 ) {
+																	return true;
+																}
 															}
+															return false;
 														}
-														return false;
+														catch(Exception e) {
+															return false;
+														}
 													};
 												
 		
@@ -72,8 +82,6 @@ public class Job1_spark {
 					return new Tuple2<>(ticker, new Tuple8<>(date,date,close,close,close,close,volume,counter));
 				};
 		
-//		JavaPairRDD<String, Tuple3<LocalDate,Float,Long>> tuples = lines.filter(checkLine)
-//																		.mapToPair(takeRelevantValues);
 
 		JavaPairRDD<String,Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>> tuplesRedundant = lines.filter(checkLine)
 																											.mapToPair(prepareValues);
@@ -111,7 +119,7 @@ public class Job1_spark {
 		
 		//PRODUCE RESULTS
 		
-		Function<Tuple2<String, Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>>, String> produceResults =
+		Function<Tuple2<String, Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>>, Result_Job1> produceResults =
 				t -> {
 					
 					String ticker = t._1();
@@ -131,22 +139,37 @@ public class Job1_spark {
 					long counter = t._2()._8();
 					long avgVolume = sumVolume / counter;
 
-					return ticker + COMMA + percentageChange + COMMA + minPrice + COMMA + maxPrice + COMMA + avgVolume;
+					return new Result_Job1(ticker, percentageChange, minPrice, maxPrice, avgVolume);
 					
 				};
+				
+				//percentageChange, ticker + COMMA + percentageChange + COMMA + minPrice + COMMA + maxPrice + COMMA + avgVolume
 				
 				/*PER ORDINARE PER ORDINE DECRESCENTE USA sortByKey([ascending], [numTasks])   
 				 * FACENDO RESTITUIRE PRIMA DELLE COPPIE CHIAVE VALORE DOVE LA CHIAVE È LA VARIAZIONE CON IL MENO DAVANTI*/
 		
-		JavaRDD<String> results = resultsReduntant.map(produceResults);
+		JavaRDD<Result_Job1> results = resultsReduntant.map(produceResults).sortBy(f -> f, true, 1);
 		
-		/*SCRIVE IN OUTPUT*/
-		results.saveAsTextFile(args[1]);
+        List<Result_Job1> listCsvLines = results.collect();
+        
+        
+        /*SCRIVE IN OUTPUT*/
+        
+        
+        FileWriter writer = new FileWriter(outputPath); 
+        
+        String header = "TICKER" + COMMA + "VARIAZIONE_QUOTAZIONE_%" + COMMA + "PREZZO_MIN" + COMMA + "PREZZO_MAX" + COMMA + "VOLUME_MEDIO";
+        writer.write(header + System.lineSeparator());
+        
+        for(Result_Job1 res: listCsvLines) {
+        	writer.write(res.getTicker() + COMMA + res.toString() + System.lineSeparator());
+        }
+        writer.close();
 
 		spark.stop();
+		
+		Instant finish = Instant.now();
+		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
 	}
 	
-	public interface Result{
-		
-	}
 }
