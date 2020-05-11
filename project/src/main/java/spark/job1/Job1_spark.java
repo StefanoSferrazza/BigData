@@ -87,7 +87,9 @@ public class Job1_spark {
 																											.mapToPair(prepareValues);
 		
 		// Reduce creation
-		Function2<Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>, Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>, Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>> reducer = 
+		Function2<	Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>, 
+					Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>, 
+					Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>> reducer = 
 				(t1,t2) -> {
 					LocalDate firstDate = t1._1();
 					LocalDate lastDate = t1._2();
