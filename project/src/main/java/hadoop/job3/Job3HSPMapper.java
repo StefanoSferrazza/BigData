@@ -37,6 +37,8 @@ public class Job3HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 	        				Utilities.inputExists(tokens[0]) &&
 	        				Utilities.inputExists(tokens[2]) &&
 	        				Utilities.inputExists(tokens[7])) {
+						
+						//	<ticker, (historical_stock_prices,close,date)>
 						context.write(new Text(tokens[0]), new Text(SEPARATOR_HSP + COMMA + tokens[2] + COMMA + tokens[7]));
 					}
 				}

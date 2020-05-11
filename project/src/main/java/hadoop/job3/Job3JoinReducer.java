@@ -87,8 +87,8 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 		Map<Integer, Float> actionYearFirstClose = new HashMap<Integer, Float>();
 		Map<Integer, Float> actionYearLastClose = new HashMap<Integer, Float>();
-		Map<Integer, LocalDate>  actionYearFirstDate = new HashMap<Integer, LocalDate>();
-		Map<Integer, LocalDate>  actionYearLastDate = new HashMap<Integer, LocalDate>();
+		Map<Integer, LocalDate> actionYearFirstDate = new HashMap<Integer, LocalDate>();
+		Map<Integer, LocalDate> actionYearLastDate = new HashMap<Integer, LocalDate>();
 
 		String companyName = "";
 

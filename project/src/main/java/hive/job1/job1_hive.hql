@@ -1,62 +1,62 @@
-DROP TABLE if exists ticker_firstlast_values;
+DROP TABLE if exists ticker_firstlastvalues;
 
-CREATE TABLE ticker_firstlast_values
-ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+CREATE TABLE ticker_firstlastvalues
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
-SELECT ticker AS ticker_firstlast,
-	   MIN(date_ticker) AS first_date,
-	   MAX(date_ticker) AS last_date,
-	   MIN(close) AS min_close, 
-       MAX(close) AS max_close,
-       AVG(volume) AS avg_volume	   
+SELECT ticker as ticker,
+	   MIN(date_ticker) as first_date,
+	   MAX(date_ticker) as last_date,
+	   MIN(close) as min_close, 
+       MAX(close) as max_close,
+       AVG(volume) as avg_volume	   
 FROM historical_stock_prices
-WHERE year(date_ticker) BETWEEN '2008' AND '2018'
+WHERE year(date_ticker) between '2008' and '2018'
 GROUP BY ticker;
 
 
-DROP TABLE if exists ticker_first_close;
+DROP TABLE if exists ticker_firstclose;
 
-CREATE TABLE ticker_first_close
-ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+CREATE TABLE ticker_firstclose
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
-SELECT hsp.ticker as ticker_first,
+SELECT hsp.ticker as ticker,
 	   hsp.close as first_close
-FROM historical_stock_prices hsp JOIN ticker_firstlast_values tfd
-	 ON (hsp.ticker = tfd.ticker_firstlast AND hsp.date_ticker = tfd.first_date);
+FROM historical_stock_prices hsp JOIN ticker_firstlastvalues tfd
+	 ON (hsp.ticker = tfd.ticker and hsp.date_ticker = tfd.first_date);
 
 
-DROP TABLE if exists ticker_last_close;
+DROP TABLE if exists ticker_lastclose;
 
-CREATE TABLE ticker_last_close
-ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+CREATE TABLE ticker_lastclose
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
-SELECT hsp.ticker AS ticker_last,
+SELECT hsp.ticker AS ticker,
 	   hsp.close AS last_close
-FROM historical_stock_prices hsp JOIN ticker_firstlast_values tld
-	 ON (hsp.ticker = tld.ticker_firstlast AND hsp.date_ticker = tld.last_date);
+FROM historical_stock_prices hsp JOIN ticker_firstlastvalues tld
+	 ON (hsp.ticker = tld.ticker and hsp.date_ticker = tld.last_date);
 
 
 DROP TABLE if exists job1_hive;
 
 CREATE TABLE job1_hive
-ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
-SELECT tfc.ticker_first AS ticker,
-       ((tlc.last_close - tfc.first_close)/tfc.first_close)*100 AS delta_quot,
-	   tflv.min_close AS min_close,
-	   tflv.max_close AS max_close,
-	   tflv.avg_volume AS avg_volume
-FROM ticker_first_close tfc JOIN ticker_last_close tlc
-	ON (tfc.ticker_first = tlc.ticker_last)
-							JOIN ticker_firstlast_values tflv
-	ON (tfc.ticker_first = tflv.ticker_firstlast)
-ORDER BY delta_quot DESC;
+SELECT tfc.ticker as ticker,
+       ((tlc.last_close - tfc.first_close)/tfc.first_close)*100 as delta_quot,
+	   tflv.min_close as min_close,
+	   tflv.max_close as max_close,
+	   tflv.avg_volume as avg_volume
+FROM ticker_firstclose tfc JOIN ticker_lastclose tlc
+	ON (tfc.ticker = tlc.ticker)
+							JOIN ticker_firstlastvalues tflv
+	ON (tfc.ticker = tflv.ticker)
+ORDER BY delta_quot desc;
 
 
 
-DROP TABLE if exists ticker_firstlast_values;
-DROP TABLE if exists ticker_first_close;
-DROP TABLE if exists ticker_last_close;
+DROP TABLE if exists ticker_firstlastvalues;
+DROP TABLE if exists ticker_firstclose;
+DROP TABLE if exists ticker_lastclose;
 
 
 

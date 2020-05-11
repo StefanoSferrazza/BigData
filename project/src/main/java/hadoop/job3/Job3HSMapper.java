@@ -32,8 +32,9 @@ public class Job3HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 				if(tokens.length==5	&&						
 						Utilities.inputExists(tokens[0]) &&
-						Utilities.inputExists(tokens[2])
-						) {
+						Utilities.inputExists(tokens[2])) {
+					
+					//<ticker, (historical_stock,company)>						
 					context.write(new Text(tokens[0]), new Text(SEPARATOR_HS + COMMA + tokens[2]));
 				}
 			}
