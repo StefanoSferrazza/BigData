@@ -39,13 +39,13 @@ public class Job1_spark {
 		
 		// Spark Session creation
 
-		SparkSession spark = SparkSession
+		SparkSession session = SparkSession
 				.builder()
 				.appName("Job1")
 				.getOrCreate();
 
 		// Import and Map Creation
-		JavaRDD<String> lines = spark.read().textFile(inputPath).javaRDD();
+		JavaRDD<String> lines = session.read().textFile(inputPath).javaRDD();
 
 
 		Function<String,Boolean> checkLine = s ->	{
@@ -166,7 +166,7 @@ public class Job1_spark {
         }
         writer.close();
 
-		spark.stop();
+		session.stop();
 		
 		Instant finish = Instant.now();
 		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
