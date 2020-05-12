@@ -30,7 +30,7 @@ public class Job2_spark {
 	
 	public static void main(String[] args) throws IOException {
 		if (args.length!=3) {
-			System.err.println("Usage: ./bin/spark-submit --class spark.job1.Job1_spark jar_path input_path/historical_stocks input_path/historical_stock_prices output_path");
+			System.err.println("Usage: ./bin/spark-submit --class spark.job2.Job2_spark jar_path input_path/historical_stocks input_path/historical_stock_prices output_path");
 			System.exit(1);
 		}
 
@@ -264,7 +264,7 @@ public class Job2_spark {
 					
 					String companyYear = tuple._1;
 					
-					return companyYear + COMMA + avgVolumes + COMMA + avgVars + COMMA + avgDailyQuots;
+					return companyYear + COMMA + avgVolumes + COMMA + avgVars + "%" + COMMA + avgDailyQuots;
 				};
 
 				
