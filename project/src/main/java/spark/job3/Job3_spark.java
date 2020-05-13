@@ -1,9 +1,12 @@
 package spark.job3;
 
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 
+import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -23,6 +26,8 @@ public class Job3_spark {
 
 	private static final String COMMA = ",";
 
+	private static final String SEMICOLON =";";
+	
 	public static void main(String[] args) throws IOException {
 
 		if (args.length!=3) {
@@ -105,13 +110,7 @@ public class Job3_spark {
 					return new Tuple2<>(ticker , new Tuple2<>(close,date));
 		};
 		
-		JavaPairRDD<String,String> valuesHS = linesHS.filter(checkInputHS).mapToPair(prepareValuesHS);
 		
-		JavaPairRDD<String,Tuple2<Float,LocalDate>> valuesHSP = linesHSP.filter(checkInputHSP).mapToPair(prepareValuesHSP);
-		
-		
-		
-		JavaPairRDD<String, Tuple2<Tuple2<Float, LocalDate>, String>> resultjoin = valuesHSP.join(valuesHS);
 		
 		PairFunction<	Tuple2<String, Tuple2<Tuple2<Float, LocalDate>, String>>,					//<ticker, [(close,date),(company)]>
 		String, Tuple5<LocalDate,LocalDate,Float,Float,String>> 	reorganizeValuesAfterJoin = 			//<(ticker,year),(firstDate,lastDate,firstClose,lastClose,company)>
@@ -153,6 +152,8 @@ public class Job3_spark {
 						return new Tuple5<>(firstDate,lastDate,firstClose,lastClose,company);
 		};
 		
+		
+		
 		PairFunction<	Tuple2<String,Tuple5<LocalDate,LocalDate,Float,Float,String>>,
 						String, Tuple2<Float,Float>> map_fromTickerToCompany = 
 		tuple -> {
@@ -168,6 +169,8 @@ public class Job3_spark {
 			String companyYearKey = company + COMMA + year;
 			return new Tuple2<>(companyYearKey, new Tuple2<>(firstClose,lastClose));
 		};
+		
+		
 		
 		//firstClose,lastClose
 		Function2<	Tuple2<Float,Float>,
@@ -210,6 +213,8 @@ public class Job3_spark {
 						
 		};
 		
+
+		
 		Function2<	Tuple3<Float,Float,Float>,
 					Tuple3<Float,Float,Float>,
 					Tuple3<Float,Float,Float> > reduce_unifyTrends =
@@ -230,13 +235,66 @@ public class Job3_spark {
 						}
 						
 						return new Tuple3<>(varYear2016,varYear2017,varYear2018);
-					};
+		};
+		
+		PairFunction<	Tuple2<String,Tuple3<Float,Float,Float>>,
+		Tuple3<Integer,Integer,Integer>, String> invertKey_fromCompany_toVarYear =
+			tuple -> {
+				Integer varYear2016 = Math.round(tuple._2()._1());
+				Integer varYear2017 = Math.round(tuple._2()._2());
+				Integer varYear2018 = Math.round(tuple._2()._3());
+				
+				String company = tuple._1();
+				return new Tuple2<>(new Tuple3<>(varYear2016,varYear2017,varYear2018), company);
+		};
+		
+		Function2<	String,
+					String,
+					String	> reduce_companySameTrend =
+					(tuple1, tuple2) -> {
+						return tuple1 + SEMICOLON + tuple2;
+		};
+		
+		
+		
+		JavaPairRDD<String,String> valuesHS = linesHS.filter(checkInputHS).mapToPair(prepareValuesHS);
+		
+		JavaPairRDD<String,Tuple2<Float,LocalDate>> valuesHSP = linesHSP.filter(checkInputHSP).mapToPair(prepareValuesHSP);
+		
+		
+		//context.write(new Text( " { AZIENDE_CON_TREND_COMUNE }:") , new Text("2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%"));
+		
+		JavaPairRDD<Tuple3<Integer,Integer,Integer>, String> results = valuesHSP.join(valuesHS)
+																				.mapToPair(reorganizeValuesAfterJoin)
+																				.reduceByKey(reduce_findFirstLastCloses)
+																				.mapToPair(map_fromTickerToCompany)
+																				.reduceByKey(reduce_sumFirstLastCloses)
+																				.mapToPair(map_calculateVarPercCompanyYear_changeKeyToCompany)
+																				.reduceByKey(reduce_unifyTrends)
+																				.mapToPair(invertKey_fromCompany_toVarYear)
+																				.reduceByKey(reduce_companySameTrend);
+		
+		
+		
+		FileWriter writer = new FileWriter(outputPath); 
+		String header = "{AZIENDE_CON_TREND_COMUNE}:,2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%";
+		
+		writer.write(header + System.lineSeparator());
 
-		//DA QUI IN POI SI HA <COMPANY, varYear2016,varYear2017,varYear2018>
+		for(Tuple2<Tuple3<Integer, Integer, Integer>, String> res : results.collect()) {
+			String companies = res._2();
+			Integer varYear2016 = res._1._1();
+			Integer varYear2017 = res._1._2();
+			Integer varYear2018 = res._1._3();
+			writer.write("{" + companies + "}: " + COMMA + "2016: " + varYear2016 + "%" + COMMA + "2017: " + varYear2017 + "%" + COMMA + "2018: " + varYear2018 + "%" + System.lineSeparator());
+		}
 		
+		writer.close();
+
+		session.stop();
 		
-		
-		
-		
+		Instant finish = Instant.now();
+		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
+
 	}
 }
