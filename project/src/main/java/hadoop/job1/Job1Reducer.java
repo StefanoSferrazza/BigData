@@ -80,8 +80,6 @@ public class Job1Reducer extends Reducer<Text, Text, Text, Text>{
 		long avgVolume = sumVolumes/counterTuples;
 
 		percentageChange = Utilities.truncateToSecondDecimal(percentageChange);
-		//		minPrice = u.truncateToSecondDecimal(minPrice);
-		//		maxPrice = u.truncateToSecondDecimal(maxPrice);
 
 		String ticker = key.toString();
 

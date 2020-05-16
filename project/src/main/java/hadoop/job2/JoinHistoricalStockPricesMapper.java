@@ -34,6 +34,10 @@ public class JoinHistoricalStockPricesMapper extends Mapper<LongWritable, Text, 
 	        				Utilities.inputExists(tokens[6]) &&
 	        				Utilities.inputExists(tokens[7]) ) {
 						
+						/*parsing solo per lanciare eccezione nel caso in cui i dati fossero sporchi, così da skippare la riga*/
+						Float.parseFloat(tokens[2]);
+						Long.parseLong(tokens[6]);
+						
 						//	<ticker, (historical_stock_prices,close,volume,date)>
 						context.write(new Text(tokens[0]), new Text(SEPARATOR_HSP + COMMA + tokens[2] + COMMA + tokens[6] + COMMA + tokens[7]));
 					}
