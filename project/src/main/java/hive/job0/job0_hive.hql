@@ -8,7 +8,7 @@ CREATE TABLE historical_stock_prices (
         low_the FLOAT,
         high_the FLOAT,
         volume BIGINT,
-        date_ticker DATE)
+        day DATE)
     ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
     
 
