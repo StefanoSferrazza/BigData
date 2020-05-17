@@ -19,7 +19,7 @@ GROUP BY ticker;
 
 DROP TABLE if exists ex1_hive;
 
-CREATE TABLE job1_hive
+CREATE TABLE ex1_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT tfc.ticker as ticker,
@@ -44,7 +44,7 @@ ORDER BY delta_quot desc;
 
 
 
----------- VERSION WITH TEMPORARY TABLES ----------
+---------- VERSION WITH TEMPORARY TABLES: PROBABLY WILL BE REMOVED ----------
 
 DROP TABLE if exists ticker_firstclose;
 
@@ -68,9 +68,10 @@ FROM historical_stock_prices hsp JOIN ticker_firstlastvalues tld
 	 ON (hsp.ticker = tld.ticker and hsp.day = tld.last_date);
 
 
+
 DROP TABLE if exists ex1_hive;
 
-CREATE TABLE job1_hive
+CREATE TABLE ex1_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT tfc.ticker as ticker,
@@ -83,7 +84,6 @@ FROM ticker_firstclose tfc JOIN ticker_lastclose tlc
 						   JOIN ticker_firstlastvalues tflv
 	ON (tfc.ticker = tflv.ticker)
 ORDER BY delta_quot desc;
-
 
 
 

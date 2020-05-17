@@ -2,15 +2,16 @@ DROP TABLE if exists historical_stock_prices;
 
 CREATE TABLE historical_stock_prices (
         ticker STRING,
-        open FLOAT,
-        close FLOAT,
-        adj_close FLOAT,
-        low_the FLOAT,
-        high_the FLOAT,
+        open DECIMAL,
+        close DECIMAL,
+        adj_close DECIMAL,
+        low_the DECIMAL,
+        high_the DECIMAL,
         volume BIGINT,
         day DATE)
-    ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
     
+
 
 DROP TABLE if exists historical_stocks;
 
@@ -20,7 +21,7 @@ CREATE TABLE historical_stocks (
         company STRING,
         sector STRING,
         industry STRING)
-    ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
 
 
 
