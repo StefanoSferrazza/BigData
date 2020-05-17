@@ -1,7 +1,6 @@
 DROP TABLE if exists ticker_firstlastvalues;
 
 CREATE TEMPORARY TABLE ticker_firstlastvalues
-ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT ticker as ticker,
 	   MIN(day) as first_date,
@@ -49,7 +48,6 @@ ORDER BY delta_quot desc;
 DROP TABLE if exists ticker_firstclose;
 
 CREATE TEMPORARY TABLE ticker_firstclose
-ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT hsp.ticker as ticker,
 	   hsp.close as first_close

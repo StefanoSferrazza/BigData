@@ -30,9 +30,9 @@ GROUP BY ticker, sector, year(day);
 
 
 
-DROP TABLE if exists job2basic_hive;
+DROP TABLE if exists ex2basic_hive;
 
-CREATE TABLE job2basic_hive 
+CREATE TABLE ex2basic_hive 
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' 
 AS
 SELECT s as sector, 
@@ -45,7 +45,6 @@ FROM
 	   		  ty.year as y,
 	   		  ty.ticker as t,
 	   		  ty.volume as v,
-	   		  ts.close,
 	   		  last_date as ld,
 	   		  ty.close as c,
 	   		  num as n

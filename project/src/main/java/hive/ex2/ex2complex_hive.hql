@@ -1,7 +1,6 @@
 DROP TABLE if exists ticker_firstlastdateyear;
 
 CREATE TEMPORARY TABLE ticker_firstlastdateyear
-ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT hs.ticker,
 	   company,
@@ -22,7 +21,6 @@ GROUP BY hs.ticker, company, sector, year(day);
 DROP TABLE if exists ticker_firstlastcloseyear;
 
 CREATE TEMPORARY TABLE ticker_firstlastcloseyear
-ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT first.ticker as ticker,
 	   company,
@@ -57,7 +55,6 @@ ON (first.ticker = last.ticker and first.year = last.year);
 DROP TABLE if exists company_quotationyear;
 
 CREATE TEMPORARY TABLE company_quotationyear
-ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT company,
 	   sector,
