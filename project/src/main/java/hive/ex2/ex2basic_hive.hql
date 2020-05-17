@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS ticker_sector;
+DROP TABLE if exists ticker_sector;
 
 CREATE TEMPORARY TABLE ticker_sector
 AS
@@ -13,7 +13,7 @@ WHERE year(hsp.day) between '2008' and '2018';
 
 
 
-DROP TABLE IF EXISTS ticker_year;
+DROP TABLE if exists ticker_year;
 
 CREATE TEMPORARY TABLE ticker_year
 AS
@@ -30,13 +30,13 @@ GROUP BY ticker, sector, year(day);
 
 
 
-DROP TABLE IF EXISTS job2basic_hive;
+DROP TABLE if exists job2basic_hive;
 
 CREATE TABLE job2basic_hive 
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' 
 AS
 SELECT s as sector, 
-       y as year, 
+       y as year,
        ROUND(AVG(v)) as avgVolume, 
        ROUND(AVG(((ts.close - tmp.c) / tmp.c) * 100), 2),
        ROUND(SUM(c) / SUM(n), 2)
@@ -59,3 +59,6 @@ JOIN ticker_sector ts ON ts.sector = s
        AND ts.ticker = t 
        AND ts.day = ld
 GROUP BY s, y;
+
+
+

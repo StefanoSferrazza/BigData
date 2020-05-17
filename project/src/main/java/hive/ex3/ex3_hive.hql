@@ -14,13 +14,15 @@ GROUP BY ticker, year(day);
 
 
 
+---------- quotation - FIRST VERSION: first delta quot per ticker, then avg for each company ----------
+
 DROP TABLE if exists ticker_quotationyear;
 
 CREATE TEMPORARY TABLE ticker_quotationyear
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT first.ticker as ticker,
-	   first.year as year,
+	   first.year as year,     
        cast(((last.last_close - first.first_close)/first.first_close)*100 as BIGINT) as delta_quot
 FROM ( SELECT tfldy.ticker as ticker,
 	   		  tfldy.year as year,
@@ -46,6 +48,47 @@ AS
 SELECT company,
 	   year,
        cast (AVG(delta_quot) as INT) as delta_quot		 -- maybe change with FLOOR
+FROM historical_stocks hs JOIN ticker_quotationyear tqy
+	 ON hs.ticker = tqy.ticker
+GROUP BY company, year;
+
+
+
+---------- quotation - SECOND VERSION: sum first_close and sum last_close, then delta_quot ----------
+
+DROP TABLE if exists ticker_quotationyear;
+
+CREATE TEMPORARY TABLE ticker_quotationyear
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
+AS
+SELECT first.ticker as ticker,
+	   first.year as year,     
+	   first_close,
+	   last_close
+FROM ( SELECT tfldy.ticker as ticker,
+	   		  tfldy.year as year,
+	   		  hsp.close as first_close
+	    FROM ticker_firstlastdateyear tfldy JOIN historical_stock_prices hsp
+	   	    ON (tfldy.ticker = hsp.ticker and tfldy.first_date = hsp.day)
+	 ) first
+JOIN ( SELECT tfldy.ticker as ticker,
+	   		  tfldy.year as year,
+	   		  hsp.close as last_close
+	   FROM ticker_firstlastdateyear tfldy JOIN historical_stock_prices hsp
+	        ON (tfldy.ticker = hsp.ticker and tfldy.last_date = hsp.day)
+	 ) last
+ON (first.ticker = last.ticker and first.year = last.year);
+
+
+
+DROP TABLE if exists company_quotationyear;
+
+CREATE TEMPORARY TABLE company_quotationyear
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
+AS
+SELECT company,
+	   year,
+       cast(((last_close - first_close)/first_close)*100 as BIGINT) delta_quot
 FROM historical_stocks hs JOIN ticker_quotationyear tqy
 	 ON hs.ticker = tqy.ticker
 GROUP BY company, year;
