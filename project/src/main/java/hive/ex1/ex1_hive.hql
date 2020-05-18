@@ -1,13 +1,13 @@
 DROP TABLE if exists ticker_firstlastvalues;
 
 CREATE TEMPORARY TABLE ticker_firstlastvalues
-AS
+AS	 
 SELECT ticker as ticker,
 	   MIN(day) as first_date,
 	   MAX(day) as last_date,
-	   MIN(close) as min_close, 
-       MAX(close) as max_close,
-       AVG(volume) as avg_volume	   
+	   ROUND(MIN(close),3) as min_close,
+       ROUND(MAX(close),3) as max_close,
+       FLOOR(AVG(volume)) as avg_volume
 FROM historical_stock_prices
 WHERE year(day) between '2008' and '2018'
 GROUP BY ticker;
@@ -22,7 +22,7 @@ CREATE TABLE ex1_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT tfc.ticker as ticker,
-       ((tlc.last_close - tfc.first_close)/tfc.first_close)*100 as delta_quot,
+       ROUND(((tlc.last_close - tfc.first_close)/tfc.first_close)*100, 2) as delta_quot,
 	   tflv.min_close as min_close,
 	   tflv.max_close as max_close,
 	   tflv.avg_volume as avg_volume
@@ -43,7 +43,7 @@ ORDER BY delta_quot desc;
 
 
 
----------- VERSION WITH TEMPORARY TABLES: PROBABLY WILL BE REMOVED ----------
+---------- VERSION WITH TEMPORARY TABLES ----------
 
 DROP TABLE if exists ticker_firstclose;
 
@@ -73,7 +73,7 @@ CREATE TABLE ex1_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT tfc.ticker as ticker,
-       ((tlc.last_close - tfc.first_close)/tfc.first_close)*100 as delta_quot,
+       ROUND(((tlc.last_close - tfc.first_close)/tfc.first_close)*100, 2) as delta_quot,
 	   tflv.min_close as min_close,
 	   tflv.max_close as max_close,
 	   tflv.avg_volume as avg_volume

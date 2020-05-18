@@ -134,7 +134,7 @@ SELECT *
 FROM ( SELECT COLLECT_SET(company) as companies,
 	          quot_years
 	   FROM ( SELECT company,
-	   				 concat_ws(';', quot_years) as quot_years
+	   				 CONCAT_WS(';', quot_years) as quot_years
 			  FROM company_quotationyear_collected
 			  WHERE size(quot_years)==3
 	   		) tmp
