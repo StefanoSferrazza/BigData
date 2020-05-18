@@ -44,7 +44,7 @@ public class Job2_companies extends Configured implements Tool{
 		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, JoinHistoricalStockPricesMapper.class);
 		FileOutputFormat.setOutputPath(join, temp1);
 		
-		join.setReducerClass(JoinReducer.class);
+		join.setReducerClass(JoinReducer_withCompany.class);
 		join.setOutputKeyClass(Text.class);
 		join.setOutputValueClass(Text.class);
 		join.setOutputFormatClass(TextOutputFormat.class);
@@ -121,7 +121,7 @@ public class Job2_companies extends Configured implements Tool{
 			System.out.println("Usage: Job2_companies .../historical_stocks.csv .../historical_stock_prices.csv .../RISULTATO_JOB2");
 			System.exit(-1);
 		}
-		int res = ToolRunner.run(new Configuration(), new Job2(), args);
+		int res = ToolRunner.run(new Configuration(), new Job2_companies(), args);
 		System.exit(res);
 	}
 }

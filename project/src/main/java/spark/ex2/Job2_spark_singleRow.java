@@ -130,7 +130,8 @@ public class Job2_spark_singleRow {
 				return new Tuple2<>(tickerYearKey ,new Tuple9<>(volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector));
 			};
 			
-							
+			
+			//volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector
 			Function2<	Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>,
 						Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>,
 						Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>> reduce_sumVolumesTicker_findFirstLastClose =

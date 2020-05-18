@@ -37,8 +37,8 @@ public class Job2ReducerSector_withCompany extends Reducer<Text,Text,Text,Text>{
 			}
 
 			long avgVolume = Math.round((float)(sumVolume / counterCompanies));
-			float avgVar = Math.round(sumVar / counterCompanies);
-			float avgAvgDailyCloses = Math.round(sumAvgDailyCloses / counterCompanies);
+			float avgVar = sumVar / counterCompanies;
+			float avgAvgDailyCloses = sumAvgDailyCloses / counterCompanies;
 			
 			
 			//("SETTORE, ANNO"), ("VOLUME_ANNUALE_MEDIO,VARIAZIONE_ANNUALE_MEDIA,QUOTAZIONE_GIORNALIERA_MEDIA"));
