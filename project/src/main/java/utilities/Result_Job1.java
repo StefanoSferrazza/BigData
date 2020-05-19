@@ -12,12 +12,12 @@ public class Result_Job1 implements Comparable<Result_Job1>,Serializable{
 	private static final String COMMA = ",";
 	
 	private String ticker;
-	private Float percentageChange;
+	private Integer percentageChange;
 	private Float minPrice;
 	private Float maxPrice;
 	private Long avgVolume;
 	
-	public Result_Job1(String ticker, Float percentageChange, Float minPrice, Float maxPrice, Long avgVolume) {
+	public Result_Job1(String ticker, Integer percentageChange, Float minPrice, Float maxPrice, Long avgVolume) {
 		this.ticker = ticker;
 		this.percentageChange = percentageChange;
 		this.minPrice = minPrice;
@@ -90,8 +90,8 @@ public class Result_Job1 implements Comparable<Result_Job1>,Serializable{
 	
 	public String getTicker() { return ticker; }
 	public void setTicker(String ticker) { this.ticker = ticker; }
-	public Float getPercentageChange() { return percentageChange; }
-	public void setPercentageChange(Float percentageChange) { this.percentageChange = percentageChange; }
+	public Integer getPercentageChange() { return percentageChange; }
+	public void setPercentageChange(Integer percentageChange) { this.percentageChange = percentageChange; }
 	public Float getMinPrice() { return minPrice; }
 	public void setMinPrice(Float minPrice) { this.minPrice = minPrice; }
 	public Float getMaxPrice() { return maxPrice; }
