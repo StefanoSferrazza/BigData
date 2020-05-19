@@ -18,13 +18,10 @@ public class Job2Reducer extends Reducer<Text,Text,Text,Text>{
 	}
 	
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
-		//	<(sector,year), (avgDailyClose,yearPercentageVariation,sumVolume)>
+
 		try {
 			
-//			(sector,year), (sumVolume,lastClose,firstClose,sumDailyClose,yearRow)
 			long sumVolume = 0;
-//			float sumAnnualVariation = 0;
-//			float sumAvgDailyClose = 0;
 			float sumLastCloses = 0;
 			float sumFirstCloses = 0;
 			float sumDailyCloses = 0;
@@ -41,14 +38,10 @@ public class Job2Reducer extends Reducer<Text,Text,Text,Text>{
 					sumFirstCloses += Float.parseFloat(tokens[2]);
 					sumDailyCloses += Float.parseFloat(tokens[3]);
 					yearRows += Long.parseLong(tokens[4]);
-//					sumAnnualVariation += Float.parseFloat(tokens[1]);
-//					sumAvgDailyClose += Float.parseFloat(tokens[2]);
 				}
 			}
 
-			Long avgSumVolume = (Long)(sumVolume/counterRows);				//RIVEDI PER ARROTONDAMENTO
-//			float avgSumAnnualVariation = sumAnnualVariation/counterRows;
-//			float avgSumAvgDailyClose = sumAvgDailyClose/counterRows;
+			Long avgSumVolume = (Long)(sumVolume/counterRows);	
 			float avgYearVar = ((sumLastCloses-sumFirstCloses)/sumFirstCloses)*100;
 			float avgDailyClose = sumDailyCloses/yearRows;
 			

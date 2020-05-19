@@ -98,7 +98,6 @@ public class JoinReducer_withCompany extends Reducer<Text, Text, Text, Text>{
 //				float avgDailyClose = sumDailyClose/yearRow;
 
 
-
 				//	<(company,year), (sumVolume,lastClose,firstClose,sumDailyClose,yearRow,sector)>				
 				context.write(new Text(company + COMMA + year), new Text(sumVolume + COMMA + lastClose + COMMA + firstClose + COMMA + sumDailyClose + COMMA + yearRow + COMMA + sector));
 			}

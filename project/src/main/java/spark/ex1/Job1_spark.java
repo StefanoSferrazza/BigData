@@ -130,8 +130,7 @@ public class Job1_spark {
 					
 					float lastClose = t._2()._4();
 					
-					float percentageChange = ((lastClose - firstClose) / firstClose)*100;
-					percentageChange = Utilities.truncateToSecondDecimal(percentageChange);
+					int percentageChange = Math.round(((lastClose - firstClose) / firstClose)*100);
 
 					float minPrice = t._2()._5();
 					

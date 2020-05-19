@@ -17,7 +17,7 @@ public class Job1Reducer extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private List<Result_Job1> results;
-	
+
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
 		context.write(new Text("TICKER"), new Text("VARIAZIONE_QUOTAZIONE_%" + COMMA + "PREZZO_MIN" + COMMA + "PREZZO_MAX" + COMMA + "VOLUME_MEDIO"));
@@ -73,11 +73,9 @@ public class Job1Reducer extends Reducer<Text, Text, Text, Text>{
 			sumVolumes += volume;
 		}
 
-		float percentageChange = ((actualFinalCloseValue - actualInitialCloseValue) / actualInitialCloseValue)*100;
+		int percentageChange = Math.round(((actualFinalCloseValue - actualInitialCloseValue) / actualInitialCloseValue)*100);
 
 		long avgVolume = sumVolumes/counterTuples;
-
-		percentageChange = Utilities.truncateToSecondDecimal(percentageChange);
 
 		String ticker = key.toString();
 

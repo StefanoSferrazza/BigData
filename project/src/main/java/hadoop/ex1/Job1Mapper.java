@@ -19,13 +19,13 @@ public class Job1Mapper extends Mapper<LongWritable, Text, Text, Text> {
 			if (key.get() == 0)
 				return;
 
-			String[] tokens = value.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+			String[] tokens = value.toString().split(COMMA);
 
 			if(tokens.length==8 &&
-					Utilities.inputExists(tokens[0]) &&
-					Utilities.inputExists(tokens[2]) &&
-					Utilities.inputExists(tokens[6]) &&
-					Utilities.inputExists(tokens[7])) {
+					Utilities.inputExists(tokens[0]) &&		//ticker
+					Utilities.inputExists(tokens[2]) &&		//close
+					Utilities.inputExists(tokens[6]) &&		//volume
+					Utilities.inputExists(tokens[7])) {		//date
 
 				LocalDate date = LocalDate.parse(tokens[7]);
 
