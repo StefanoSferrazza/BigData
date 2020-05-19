@@ -15,7 +15,6 @@ GROUP BY ticker;
 
 
 ---------- VERSION WITHOUT TEMPORARY TABLES ----------
-
 DROP TABLE if exists ex1_hive;
 
 CREATE TABLE ex1_hive
@@ -44,7 +43,6 @@ ORDER BY delta_quot desc;
 
 
 ---------- VERSION WITH TEMPORARY TABLES ----------
-
 DROP TABLE if exists ticker_firstclose;
 
 CREATE TEMPORARY TABLE ticker_firstclose
