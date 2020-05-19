@@ -1,4 +1,4 @@
-package hadoop.ex2_new;
+package hadoop.ex2_new_combiner;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,8 +20,14 @@ import org.apache.hadoop.util.ToolRunner;
 import hadoop.ex2.Job2;
 import hadoop.ex2.JoinHistoricalStockPricesMapper;
 import hadoop.ex2.JoinReducer;
+import hadoop.ex2_new.Job2MapperCompany_withCompany;
+import hadoop.ex2_new.Job2MapperSector_withCompany;
+import hadoop.ex2_new.Job2ReducerCompany_withCompany;
+import hadoop.ex2_new.Job2ReducerSector_withCompany;
+import hadoop.ex2_new.JoinHistoricalStocksMapper_withCompany;
+import hadoop.ex2_new.JoinReducer_withCompany;
 
-public class Job2_companies extends Configured implements Tool{
+public class Job2_companies_combiner extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
 		
 		Instant start = Instant.now();
@@ -38,7 +44,7 @@ public class Job2_companies extends Configured implements Tool{
 		/*JOIN*/
 		@SuppressWarnings("deprecation")
 		Job join = new Job(conf, "join");
-		join.setJarByClass(Job2_companies.class);
+		join.setJarByClass(Job2_companies_combiner.class);
 
 		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, JoinHistoricalStocksMapper_withCompany.class);
 		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, JoinHistoricalStockPricesMapper.class);
@@ -59,13 +65,14 @@ public class Job2_companies extends Configured implements Tool{
 		
 		/*JOB2 companies part*/
 		@SuppressWarnings("deprecation")
-		Job job2Companies = new Job(conf, "job2_companies");
-		job2Companies.setJarByClass(Job2_companies.class);
+		Job job2Companies = new Job(conf, "job2_companies_combiner");
+		job2Companies.setJarByClass(Job2_companies_combiner.class);
 		
 		FileInputFormat.setInputPaths(job2Companies, temp1);
 		FileOutputFormat.setOutputPath(job2Companies, temp2);
 		
 		job2Companies.setMapperClass(Job2MapperCompany_withCompany.class);
+		job2Companies.setCombinerClass(Job2CombinerCompany_withCompany.class);
 		job2Companies.setReducerClass(Job2ReducerCompany_withCompany.class);
 		
 		job2Companies.setInputFormatClass(KeyValueTextInputFormat.class);
@@ -85,13 +92,14 @@ public class Job2_companies extends Configured implements Tool{
 		/*JOB2 sectors part*/
 		
 		@SuppressWarnings("deprecation")
-		Job job2Sectors = new Job(conf, "job2_sector");
-		job2Sectors.setJarByClass(Job2_companies.class);
+		Job job2Sectors = new Job(conf, "job2_sector_combiner");
+		job2Sectors.setJarByClass(Job2_companies_combiner.class);
 		
 		FileInputFormat.setInputPaths(job2Sectors, temp2);
 		FileOutputFormat.setOutputPath(job2Sectors, output);
 		
 		job2Sectors.setMapperClass(Job2MapperSector_withCompany.class);
+		job2Sectors.setCombinerClass(Job2CombinerSector_withCompany.class);
 		job2Sectors.setReducerClass(Job2ReducerSector_withCompany.class);
 		
 		job2Sectors.setInputFormatClass(KeyValueTextInputFormat.class);
@@ -121,7 +129,7 @@ public class Job2_companies extends Configured implements Tool{
 			System.out.println("Usage: Job2_companies .../historical_stocks.csv .../historical_stock_prices.csv .../RISULTATO_JOB2");
 			System.exit(-1);
 		}
-		int res = ToolRunner.run(new Configuration(), new Job2_companies(), args);
+		int res = ToolRunner.run(new Configuration(), new Job2_companies_combiner(), args);
 		System.exit(res);
 	}
 }

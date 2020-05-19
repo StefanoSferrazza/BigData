@@ -23,7 +23,7 @@ public class Job2MapperSector_withCompany extends Mapper<Text,Text,Text,Text>{
 				String line = value.toString();
 				String[] tokens = line.split(COMMA);
 
-				if(tokens.length==3)
+				if(tokens.length==4)
 					context.write(new Text(keys), new Text(line));
 			}
 		}
