@@ -256,6 +256,14 @@ public class Job3_spark {
 		};
 		
 		
+		PairFunction<	Tuple2<Tuple3<Integer,Integer,Integer>, String>,
+						Integer,
+						Tuple2<Tuple3<Integer,Integer,Integer>, String>> mapByNumberSimilarCompaniesTrend =
+						tuple	->	{
+							Integer similarities = tuple._2.split(SEMICOLON).length;
+							return new Tuple2<>(similarities,tuple);
+						};
+		
 		
 		JavaPairRDD<String,String> valuesHS = linesHS.filter(checkInputHS).mapToPair(prepareValuesHS);
 		
@@ -264,7 +272,7 @@ public class Job3_spark {
 		
 		//context.write(new Text( " { AZIENDE_CON_TREND_COMUNE }:") , new Text("2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%"));
 		
-		JavaPairRDD<Tuple3<Integer,Integer,Integer>, String> results = valuesHSP.join(valuesHS)
+		JavaPairRDD<Integer,Tuple2<Tuple3<Integer,Integer,Integer>, String>> results = valuesHSP.join(valuesHS)
 																				.mapToPair(reorganizeValuesAfterJoin)
 																				.reduceByKey(reduce_findFirstLastCloses)
 																				.mapToPair(map_fromTickerToCompany)
@@ -272,21 +280,23 @@ public class Job3_spark {
 																				.mapToPair(map_calculateVarPercCompanyYear_changeKeyToCompany)
 																				.reduceByKey(reduce_unifyTrends)
 																				.mapToPair(invertKey_fromCompany_toVarYear)
-																				.reduceByKey(reduce_companySameTrend);
+																				.reduceByKey(reduce_companySameTrend)
+																				.mapToPair(mapByNumberSimilarCompaniesTrend)
+																				.sortByKey(false);
 		
 		
 		
 		FileWriter writer = new FileWriter(outputPath); 
-		String header = "{AZIENDE_CON_TREND_COMUNE}:,2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%";
+		String header = "n. aziende trend comune" + COMMA + "{AZIENDE_CON_TREND_COMUNE}:" + COMMA + "2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%";
 		
 		writer.write(header + System.lineSeparator());
 
-		for(Tuple2<Tuple3<Integer, Integer, Integer>, String> res : results.collect()) {
-			String companies = res._2();
-			Integer varYear2016 = res._1._1();
-			Integer varYear2017 = res._1._2();
-			Integer varYear2018 = res._1._3();
-			writer.write("{" + companies + "}: " + COMMA + "2016: " + varYear2016 + "%" + COMMA + "2017: " + varYear2017 + "%" + COMMA + "2018: " + varYear2018 + "%" + System.lineSeparator());
+		for(Tuple2<Integer,Tuple2<Tuple3<Integer,Integer,Integer>, String>> res : results.collect()) {
+			String companies = res._2._2();
+			Integer varYear2016 = res._2._1._1();
+			Integer varYear2017 = res._2._1._2();
+			Integer varYear2018 = res._2._1._3();
+			writer.write(res._1 + COMMA + "{" + companies + "}: " + COMMA + "2016: " + varYear2016 + "%" + COMMA + "2017: " + varYear2017 + "%" + COMMA + "2018: " + varYear2018 + "%" + System.lineSeparator());
 		}
 		
 		writer.close();
