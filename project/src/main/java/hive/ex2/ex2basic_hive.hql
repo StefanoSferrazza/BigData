@@ -3,25 +3,26 @@ DROP TABLE if exists ticker_sector;
 CREATE TEMPORARY TABLE ticker_sector
 AS
 SELECT hs.ticker as ticker, 
-	   hs.sector as sector, 
-	   hsp.volume as volume,
-	   hsp.close as close,
-	   hsp.day as day
+	   sector, 
+	   volume,
+	   close,
+	   day
 FROM historical_stocks hs JOIN historical_stock_prices hsp 
 	 ON hs.ticker = hsp.ticker
-WHERE year(hsp.day) between '2008' and '2018';
+WHERE year(day) between '2008' and '2018'
+	  and sector != 'N/A';
 
 
 
-DROP TABLE if exists ticker_year;
+DROP TABLE if exists ticker_sector_year;
 
-CREATE TEMPORARY TABLE ticker_year
+CREATE TEMPORARY TABLE ticker_sector_year
 AS
 SELECT ticker,
 	   sector,
        year(day) as year,
-       SUM(volume) as volume, 
-       SUM(close) as close,
+       SUM(volume) as volumes, 
+       SUM(close) as closes,
        MIN(day) as first_date,
        MAX(day) as last_date,
        COUNT(*) as num
@@ -35,29 +36,31 @@ DROP TABLE if exists ex2basic_hive;
 CREATE TABLE ex2basic_hive 
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' 
 AS
-SELECT s as sector, 
-       y as year,
-       ROUND(AVG(v)) as avgVolume, 
-       ROUND(AVG(((ts.close - tmp.c) / tmp.c) * 100), 2),
-       ROUND(SUM(c) / SUM(n), 2)
+SELECT tmp.sector as sector, 
+       tmp.year as year,
+       cast(AVG(tmp.volumes) as BIGINT) as avgVolume, 
+       ROUND(AVG(((ts.close - first_close) / first_close) * 100), 2),
+       ROUND(SUM(tmp.closes) / SUM(num), 2)
 FROM
-	 ( SELECT ty.sector as s,
-	   		  ty.year as y,
-	   		  ty.ticker as t,
-	   		  ty.volume as v,
-	   		  last_date as ld,
-	   		  ty.close as c,
-	   		  num as n
-	   FROM ticker_year ty JOIN ticker_sector ts
-		 	ON ty.sector = ts.sector 
+	 ( SELECT ty.ticker,
+	 		  ty.sector,
+	   		  ty.year,
+	   		  ty.volumes,
+	   		  ty.closes,
+	   		  ts.close as first_close,
+	   		  last_date,
+	   		  num
+	   FROM ticker_sector_year ty JOIN ticker_sector ts
+		 	ON  ty.ticker = ts.ticker 
+     	 	and ty.sector = ts.sector
      	 	and ty.year = year(ts.day) 
-     	 	and ty.ticker = ts.ticker
      	 	and ty.first_date = ts.day ) tmp
-JOIN ticker_sector ts ON ts.sector = s 
-       AND year(ts.day) = y 
-       AND ts.ticker = t 
-       AND ts.day = ld
-GROUP BY s, y;
+JOIN ticker_sector ts 
+	 ON  tmp.ticker = ts.ticker 
+     and tmp.sector = ts.sector
+     and tmp.year = year(ts.day)
+     and last_date = ts.day
+GROUP BY tmp.sector, tmp.year;
 
 
 
