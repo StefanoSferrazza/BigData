@@ -9,7 +9,9 @@ CREATE TABLE historical_stock_prices (
         high_the DECIMAL(15,5),
         volume BIGINT,
         day DATE)
-ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+ROW FORMAT DELIMITED 
+FIELDS TERMINATED BY ','
+STORED AS textfile;
     
 
 
@@ -21,7 +23,12 @@ CREATE TABLE historical_stocks (
         company STRING,
         sector STRING,
         industry STRING)
-ROW FORMAT DELIMITED FIELDS TERMINATED BY ',';
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
+		with serdeproperties (
+								"separatorChar" = ",",
+								"quoteChar" = "\""
+							 )
+STORED AS textfile;
 
 
 
@@ -31,11 +38,3 @@ LOAD DATA LOCAL INPATH '../BigData/Project/historical_stock_prices.csv' OVERWRIT
 LOAD DATA LOCAL INPATH '../BigData/Project/historical_stocks.csv' OVERWRITE INTO TABLE historical_stocks;
 -- LOAD DATA INPATH '/user/bigdata/input/historical_stocks.csv' OVERWRITE INTO TABLE historical_stocks;
 
-
-
--- CREATE TABLE historical_stock_prices 
---  ROW FORMAT DELIMITED 
---  FIELDS TERMINATED BY ',';
---AS SELECT Parser(hspRow) AS 
---	   (ticker,open,close,adj_close,low_the,high_the,volume,date_ticker)
---FROM historical_stock_prices_row;
