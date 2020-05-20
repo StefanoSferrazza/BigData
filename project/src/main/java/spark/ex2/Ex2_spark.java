@@ -24,7 +24,7 @@ import scala.Tuple9;
 import utilities.Result_Ex1;
 import utilities.Utilities;
 
-public class Job2_spark {
+public class Ex2_spark {
 
 	private static final String COMMA = ",";
 	
@@ -37,8 +37,6 @@ public class Job2_spark {
 		String inputPathHS = args[0];
 		String inputPathHSP = args[1];
 		String outputPath = args[2];
-
-		Instant start = Instant.now();
 
 
 		SparkSession session = SparkSession
@@ -298,8 +296,6 @@ public class Job2_spark {
 
 		session.stop();
 		
-		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
 	}
 
 }

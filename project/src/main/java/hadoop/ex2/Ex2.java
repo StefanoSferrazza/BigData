@@ -18,11 +18,9 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 
-public class Job2 extends Configured implements Tool{
+public class Ex2 extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
-		
-		Instant start = Instant.now();
-		
+				
 		/*PATHS*/
 		Path inputHS = new Path(args[0]);
 		Path inputHSP = new Path(args[1]);
@@ -34,7 +32,7 @@ public class Job2 extends Configured implements Tool{
 		/*JOIN*/
 		@SuppressWarnings("deprecation")
 		Job join = new Job(conf, "join");
-		join.setJarByClass(Job2.class);
+		join.setJarByClass(Ex2.class);
 
 		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, JoinHistoricalStocksMapper.class);
 		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, JoinHistoricalStockPricesMapper.class);
@@ -54,13 +52,13 @@ public class Job2 extends Configured implements Tool{
 		/*JOB2*/
 		@SuppressWarnings("deprecation")
 		Job job2 = new Job(conf, "job2");
-		job2.setJarByClass(Job2.class);
+		job2.setJarByClass(Ex2.class);
 		
 		FileInputFormat.setInputPaths(job2, temp);
 		FileOutputFormat.setOutputPath(job2, output);
 		
-		job2.setMapperClass(Job2Mapper.class);
-		job2.setReducerClass(Job2Reducer.class);
+		job2.setMapperClass(Ex2Mapper.class);
+		job2.setReducerClass(Ex2Reducer.class);
 		
 		job2.setInputFormatClass(KeyValueTextInputFormat.class);
 		job2.setMapOutputKeyClass(Text.class);
@@ -75,10 +73,7 @@ public class Job2 extends Configured implements Tool{
 			System.out.println("Job2 failed, exiting");
 			return -1;
 		}
-		
-		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
-		
+				
 		return 0;
 	}
 	
@@ -88,7 +83,7 @@ public class Job2 extends Configured implements Tool{
 			System.out.println("Usage: Job2 .../historical_stocks.csv .../historical_stock_prices.csv .../RISULTATO_JOB2");
 			System.exit(-1);
 		}
-		int res = ToolRunner.run(new Configuration(), new Job2(), args);
+		int res = ToolRunner.run(new Configuration(), new Ex2(), args);
 		System.exit(res);
 	}
 }

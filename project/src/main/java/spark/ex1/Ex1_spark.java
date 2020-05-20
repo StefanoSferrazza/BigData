@@ -18,7 +18,7 @@ import scala.Tuple8;
 import utilities.Result_Ex1;
 import utilities.Utilities;
 
-public class Job1_spark {
+public class Ex1_spark {
 
 	private static final String COMMA = ",";
 
@@ -31,11 +31,6 @@ public class Job1_spark {
 		
 		String inputPath = args[0];
 		String outputPath = args[1];
-
-//		String inputPath= "/home/bigdata/Documenti/bigData/progetto/daily-historical-stock-prices-1970-2018/historical_stock_prices.csv";
-//		String outputPath = "/home/bigdata/Scrivania/prova/prova.csv";
-
-		Instant start = Instant.now();
 		
 		// Spark Session creation
 
@@ -168,9 +163,6 @@ public class Job1_spark {
         writer.close();
 
 		session.stop();
-		
-		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
 	}
 	
 }

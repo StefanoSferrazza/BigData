@@ -29,9 +29,7 @@ import org.apache.hadoop.util.ToolRunner;
 public class Ex3 extends Configured implements Tool{
 
 	public int run(String[] args) throws Exception {
-		
-		Instant start = Instant.now();
-		
+				
 		
 		// JOB JOIN
 
@@ -83,10 +81,7 @@ public class Ex3 extends Configured implements Tool{
 			System.out.println("Job3 failed, exiting");
 			return -1;
 		}
-		
-		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
-		
+				
 		return 0;
 	}
 

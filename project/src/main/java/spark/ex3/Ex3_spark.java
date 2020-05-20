@@ -22,7 +22,7 @@ import scala.Tuple6;
 import scala.Tuple9;
 import utilities.Utilities;
 
-public class Job3_spark {
+public class Ex3_spark {
 
 	private static final String COMMA = ",";
 
@@ -38,9 +38,6 @@ public class Job3_spark {
 		String inputPathHS = args[0];
 		String inputPathHSP = args[1];
 		String outputPath = args[2];
-
-		Instant start = Instant.now();
-
 
 		SparkSession session = SparkSession
 				.builder()
@@ -292,19 +289,20 @@ public class Job3_spark {
 		writer.write(header + System.lineSeparator());
 
 		for(Tuple2<Integer,Tuple2<Tuple3<Integer,Integer,Integer>, String>> res : results.collect()) {
-			String companies = res._2._2();
-			Integer varYear2016 = res._2._1._1();
-			Integer varYear2017 = res._2._1._2();
-			Integer varYear2018 = res._2._1._3();
-			writer.write(res._1 + COMMA + "{" + companies + "}: " + COMMA + "2016: " + varYear2016 + "%" + COMMA + "2017: " + varYear2017 + "%" + COMMA + "2018: " + varYear2018 + "%" + System.lineSeparator());
+			Integer numCompaniesSimilarTrend = res._1;
+			if(numCompaniesSimilarTrend>1) {
+				String companies = res._2._2();
+				Integer varYear2016 = res._2._1._1();
+				Integer varYear2017 = res._2._1._2();
+				Integer varYear2018 = res._2._1._3();
+				writer.write(numCompaniesSimilarTrend + COMMA + "{" + companies + "}: " + COMMA + "2016: " + varYear2016 + "%" + COMMA + "2017: " + varYear2017 + "%" + COMMA + "2018: " + varYear2018 + "%" + System.lineSeparator());
+			}
 		}
 		
 		writer.close();
 
 		session.stop();
 		
-		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
 
 	}
 }

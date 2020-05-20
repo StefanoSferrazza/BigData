@@ -6,7 +6,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 
-public class Job2CombinerCompany_withCompany extends Reducer<Text,Text,Text,Text>{
+public class Ex2CombinerCompany_withCompany extends Reducer<Text,Text,Text,Text>{
 
 	private static final String COMMA = ",";
 	

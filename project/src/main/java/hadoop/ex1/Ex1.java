@@ -17,9 +17,6 @@ public class Ex1 {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 		
-		Instant start = Instant.now();
-
-
 		// JOB 1
 		
 		Configuration conf = new Configuration();
@@ -40,7 +37,5 @@ public class Ex1 {
 
 		job1.waitForCompletion(true);
 		
-		Instant finish = Instant.now();
-		System.out.println("COMPUTING TIME: " + Duration.between(start, finish).toMillis());
 	}
 }

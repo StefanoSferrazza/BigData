@@ -31,7 +31,7 @@ public class Ex3Reducer extends Reducer<Text,Text,Text,Text>{
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
 
-		context.write(new Text( "{COMPANIES_COMMON_TREND}:") , new Text("2016: ANN_VAR%" + COMMA + "2017: ANN_VAR%" + COMMA + "2018: ANN_VAR%"));
+		context.write(new Text("n. aziende trend comune" + COMMA + "{AZIENDE_CON_TREND_COMUNE}:") , new Text("2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%"));
 	}
 
 
@@ -68,8 +68,10 @@ public class Ex3Reducer extends Reducer<Text,Text,Text,Text>{
 		this.companiesNumbers = Utilities.sortByValue(companiesNumbers);
 		
 		for(String comps : this.companiesNumbers.keySet()) {
-			Text outputKey = new Text(comps);
+			Text companiesText = new Text(comps);
 			Text trend = new Text(this.companiesQuotations.get(comps));
+			Integer numberOfCompanies = companiesNumbers.get(comps);
+			Text outputKey = new Text(numberOfCompanies + COMMA + companiesText.toString());
 			context.write(outputKey, trend);
 		}
 	}

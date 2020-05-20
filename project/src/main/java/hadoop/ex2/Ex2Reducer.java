@@ -7,7 +7,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 
-public class Job2Reducer extends Reducer<Text,Text,Text,Text>{
+public class Ex2Reducer extends Reducer<Text,Text,Text,Text>{
 
 	private static final String COMMA = ",";
 	private static final String TAB = "\t";

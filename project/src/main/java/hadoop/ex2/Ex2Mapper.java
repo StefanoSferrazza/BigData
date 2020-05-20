@@ -7,7 +7,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
-public class Job2Mapper extends Mapper<Text,Text,Text,Text>{
+public class Ex2Mapper extends Mapper<Text,Text,Text,Text>{
 
 	private static final String COMMA = ",";
 
