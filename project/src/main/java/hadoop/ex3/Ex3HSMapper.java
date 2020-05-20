@@ -28,12 +28,9 @@ public class Ex3HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 				return;
 			else {
 				String line = value.toString();
-				String[] tokens = line.split(COMMA);
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
-				if(tokens.length==5	&&						
-						Utilities.inputExists(tokens[0]) &&
-						Utilities.inputExists(tokens[2])) {
-					
+				if(tokens.length==5) {		
 					//<ticker, (historical_stock,company)>						
 					context.write(new Text(tokens[0]), new Text(SEPARATOR_HS + COMMA + tokens[2]));
 				}

@@ -24,7 +24,7 @@ public class Ex3Mapper extends Mapper<Text, Text, Text, Text>{
 	protected void map(Text key, Text value, Context context) throws IOException, InterruptedException {
 		try {
 			String line = value.toString();
-			String[] tokens = line.split(COMMA);
+			String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
 			if(tokens.length == 3)
 				context.write(new Text(line), new Text(key));
