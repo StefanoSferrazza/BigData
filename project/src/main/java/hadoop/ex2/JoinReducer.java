@@ -30,7 +30,7 @@ public class JoinReducer extends Reducer<Text, Text, Text, Text>{
 		for(Text value : values) {
 
 			String line = value.toString();
-			String[] tokens = line.split(COMMA);
+			String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
 
 			if(tokens[0].equals(SEPARATOR_HS)) {

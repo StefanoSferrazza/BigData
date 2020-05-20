@@ -30,7 +30,7 @@ public class Ex2Reducer extends Reducer<Text,Text,Text,Text>{
 
 			for(Text value : values) {
 				String line = value.toString();
-				String[] tokens = line.split(COMMA);
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				if(tokens.length==5) {
 					counterRows++;
 					sumVolume += Long.parseLong(tokens[0]);
@@ -48,7 +48,7 @@ public class Ex2Reducer extends Reducer<Text,Text,Text,Text>{
 			avgYearVar = ((float)Math.round(avgYearVar*100))/100;
 			avgDailyClose = ((float)Math.round(avgDailyClose*100))/100;
 			
-			String[] keys = key.toString().split(COMMA);
+			String[] keys = key.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 			
 			//("SETTORE, ANNO"), ("VOLUME_ANNUALE_MEDIO,VARIAZIONE_ANNUALE_MEDIA,QUOTAZIONE_GIORNALIERA_MEDIA"));
 			context.write(new Text(keys[0] + COMMA + keys[1]), new Text(avgSumVolume + COMMA + avgYearVar + "%" + COMMA + avgDailyClose));

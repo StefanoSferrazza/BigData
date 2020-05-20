@@ -52,7 +52,7 @@ public class Ex3_spark {
 		Function<String,Boolean> checkInputHS = 
 				line ->	{
 					try {
-						String[] tokens = line.split(COMMA);
+						String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 						if(tokens.length==5 &&
 								Utilities.inputExists(tokens[0]) &&		//ticker
 								Utilities.inputExists(tokens[2])) {		//azienda
@@ -88,7 +88,7 @@ public class Ex3_spark {
 
 		PairFunction<String, String, String> prepareValuesHS = 
 				line -> {
-					String[] tokens = line.split(COMMA);
+					String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
 					String ticker = tokens[0];
 					String company = tokens[2];
@@ -98,7 +98,7 @@ public class Ex3_spark {
 
 		PairFunction<String,String,Tuple2<Float,LocalDate>>prepareValuesHSP =
 				line -> {
-					String[] tokens = line.split(COMMA);
+					String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
 					String ticker = tokens[0];
 					Float close = Float.parseFloat(tokens[2]);
@@ -154,7 +154,7 @@ public class Ex3_spark {
 		PairFunction<	Tuple2<String,Tuple5<LocalDate,LocalDate,Float,Float,String>>,
 						String, Tuple2<Float,Float>> map_fromTickerToCompany = 
 		tuple -> {
-			String[] oldKey = tuple._1.split(COMMA);
+			String[] oldKey = tuple._1.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 			String ticker = oldKey[0];			//useless
 			String year = oldKey[1];
 			
@@ -186,7 +186,7 @@ public class Ex3_spark {
 						String, Tuple3<Float,Float,Float>> map_calculateVarPercCompanyYear_changeKeyToCompany =
 					tuple -> {
 						
-						String[] oldKey = tuple._1.split(COMMA);
+						String[] oldKey = tuple._1.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 						String company = oldKey[0];			
 						Integer year = Integer.parseInt(oldKey[1]);
 						

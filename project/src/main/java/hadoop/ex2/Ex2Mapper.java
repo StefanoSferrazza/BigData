@@ -15,7 +15,7 @@ public class Ex2Mapper extends Mapper<Text,Text,Text,Text>{
 
 		try {			
 			String line = value.toString();
-			String[] tokens = line.split(COMMA);
+			String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
 			if(tokens.length==5)
 				context.write(new Text(key.toString()), new Text(line));

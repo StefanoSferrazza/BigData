@@ -21,7 +21,7 @@ public class Ex2CombinerCompany_withCompany extends Reducer<Text,Text,Text,Text>
 			String sector = "";
 			for(Text value : values) {
 				String line = value.toString();
-				String[] tokens = line.split(COMMA);
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				if(tokens.length==6) {
 					sumYearVolumeCompany += Long.parseLong(tokens[0]);
 					sumLastCloses += Float.parseFloat(tokens[1]);
