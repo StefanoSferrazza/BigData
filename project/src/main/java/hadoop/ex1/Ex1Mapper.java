@@ -9,7 +9,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 import utilities.Utilities;
 
 
-public class Job1Mapper extends Mapper<LongWritable, Text, Text, Text> {
+public class Ex1Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
 	private static final String COMMA = ",";
 

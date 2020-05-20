@@ -10,6 +10,8 @@ FROM historical_stock_prices
 WHERE year(day) between '2016' and '2018'	 
 GROUP BY ticker, year(day);
 
+
+
 ---------- quotation - PERSONAL VERSION: sum first_close and sum last_close, then delta_quot ----------
 DROP TABLE if exists ticker_quotationyear;
 
@@ -17,40 +19,48 @@ CREATE TEMPORARY TABLE ticker_quotationyear
 AS
 SELECT first.ticker as ticker,
 	   first.year as year,     
-	   first_close,
-	   last_close
+	   firstclose_ticker,
+	   lastclose_ticker
 FROM ( SELECT tfldy.ticker as ticker,
 	   		  tfldy.year as year,
-	   		  hsp.close as first_close
+	   		  hsp.close as firstclose_ticker
 	    FROM ticker_firstlastdateyear tfldy JOIN historical_stock_prices hsp
 	   	     ON (tfldy.ticker = hsp.ticker and tfldy.first_date = hsp.day)
 	 ) first
 JOIN ( SELECT tfldy.ticker as ticker,
 	   		  tfldy.year as year,
-	   		  hsp.close as last_close
+	   		  hsp.close as lastclose_ticker
 	   FROM ticker_firstlastdateyear tfldy JOIN historical_stock_prices hsp
 	        ON (tfldy.ticker = hsp.ticker and tfldy.last_date = hsp.day)
 	 ) last
 ON (first.ticker = last.ticker and first.year = last.year);
 
----------- VERSION WITH SINGLE STRING CONCAT ----------
+
+
 DROP TABLE if exists company_quotationyear;
 
 CREATE TEMPORARY TABLE company_quotationyear 
 AS
 SELECT company,
 	   COLLECT_SET( CONCAT( cast(year as STRING), ":",
-	   			  			cast(delta_quot as STRING), "%"))
+	   			  			cast(cast(((lastcloses_company - firstcloses_company)/
+	   			  						firstcloses_company)*100
+	   			  				 as BIGINT)
+	   			  			as STRING), "%"))
 	   as quot_years
-FROM ( 
+FROM (
 	   SELECT company,
 	   		  year,
-       		  cast(((last_close - first_close)/first_close)*100 as BIGINT) 
-       		  	  as delta_quot
-	   FROM historical_stocks hs JOIN ticker_quotationyear tqy
+       		  SUM(firstclose_ticker) as firstcloses_company,
+	   		  SUM(lastclose_ticker) as lastcloses_company
+	   FROM historical_stocks hs 
+	   		JOIN ticker_quotationyear tqy
 	 		ON hs.ticker = tqy.ticker
+	   GROUP BY company, year
 	 ) tmp
 GROUP BY company;
+
+
 
 DROP TABLE if exists ex3_hive;
 
@@ -75,8 +85,10 @@ ORDER BY size(comp_list) desc;
 
 
 
---------- ALTERNATIVE VERSIONS ---------
 
+
+
+--------- ALTERNATIVE VERSIONS ---------
 
 
 ---------- quotation - TEACHER VERSION: first delta quot per ticker, then avg for each company ----------

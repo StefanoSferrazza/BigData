@@ -6,7 +6,6 @@ import java.time.Instant;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -18,8 +17,6 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import hadoop.ex1.Job1ResultWritable;
-import hadoop.ex1.Job1TupleWritable;
 
 
 /**
@@ -29,12 +26,15 @@ import hadoop.ex1.Job1TupleWritable;
  * 
  *
  */
-public class Job3 extends Configured implements Tool{
+public class Ex3 extends Configured implements Tool{
 
 	public int run(String[] args) throws Exception {
 		
 		Instant start = Instant.now();
 		
+		
+		// JOB JOIN
+
 		Path temp = new Path("temp");
 		Path inputHSP = new Path(args[0]);
 		Path inputHS = new Path(args[1]);
@@ -42,15 +42,14 @@ public class Job3 extends Configured implements Tool{
 
 		Configuration conf = getConf();
 
-		@SuppressWarnings("deprecation")
-		Job join = new Job(conf, "join");
-		join.setJarByClass(Job3.class);
+		Job join = Job.getInstance(conf, "join");
+		join.setJarByClass(Ex3.class);
 
-		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, Job3HSPMapper.class);
-		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, Job3HSMapper.class);
+		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, Ex3HSPMapper.class);
+		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, Ex3HSMapper.class);
 		FileOutputFormat.setOutputPath(join, temp);
 
-		join.setReducerClass(Job3JoinReducer.class);
+		join.setReducerClass(Ex3JoinReducer.class);
 		join.setOutputKeyClass(Text.class);
 		join.setOutputValueClass(Text.class);
 		join.setOutputFormatClass(TextOutputFormat.class);
@@ -62,15 +61,15 @@ public class Job3 extends Configured implements Tool{
 		}
 
 
-		@SuppressWarnings("deprecation")
-		Job job3 = new Job(conf, "job3");
-		job3.setJarByClass(Job3.class);
+		
+		Job job3 = Job.getInstance(conf, "job3");
+		job3.setJarByClass(Ex3.class);
 		
 		FileInputFormat.setInputPaths(job3, temp);
 		FileOutputFormat.setOutputPath(job3, output);
 		
-		job3.setMapperClass(Job3Mapper.class);
-		job3.setReducerClass(Job3Reducer.class);
+		job3.setMapperClass(Ex3Mapper.class);
+		job3.setReducerClass(Ex3Reducer.class);
 		
 		job3.setInputFormatClass(KeyValueTextInputFormat.class);
 		job3.setMapOutputKeyClass(Text.class);
@@ -97,7 +96,7 @@ public class Job3 extends Configured implements Tool{
 			System.out.println("Usage: XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 			System.exit(-1);
 		}
-		int res = ToolRunner.run(new Configuration(), new Job3(), args);
+		int res = ToolRunner.run(new Configuration(), new Ex3(), args);
 		System.exit(res);
 	}
 	

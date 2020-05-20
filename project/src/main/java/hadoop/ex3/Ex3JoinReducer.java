@@ -17,7 +17,7 @@ import org.apache.hadoop.mapreduce.Reducer;
  * 
  *
  */
-public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
+public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HSP = "hsp";
@@ -53,18 +53,15 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 		}
 
 
-		public int compareTo(Pair p) {										// !!!!!!!!!!!!!!!! DO BETTER 
-																			// with COMPARATOR
+		public int compareTo(Pair p) {								// !!!!!!!!!!!!!!!! DO BETTER 
+																	// with COMPARATOR
 			int i = companyName.compareTo(p.companyName);
 		    if (i != 0) 
 		    	return i;
 		    return Integer.compare(year, p.year);
 		}
 	}
-	
-	
-	
-	
+
 
 
 	private Map<Pair, Float> companyYearStartQuotation;
@@ -74,7 +71,7 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 	@Override
 	protected void setup(Context context) {
-		// 		super.setup(context); 										?????????????
+		// 		super.setup(context); 							?????????????
 		this.companyYearStartQuotation = new TreeMap<Pair, Float>();
 		this.companyYearEndQuotation = new TreeMap<Pair, Float>();
 		this.companyAnnualVariations = new HashMap<String, String>();
@@ -113,7 +110,7 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 					}
 					else {
 						if(date.isBefore(actionYearFirstDate.get(year))) {						
-							actionYearFirstDate.replace(year,date);
+/*REPLACE OR PUT*/			actionYearFirstDate.replace(year,date);
 							actionYearFirstClose.replace(year,close);
 						}
 						else
@@ -124,13 +121,13 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 					}
 				}
 		}
-
+		
 		for(Integer year : actionYearFirstClose.keySet()) {
 			float actionFirstClose = actionYearFirstClose.get(year);
 			float actionLastClose = actionYearLastClose.get(year);
 
 			Pair companyYearStartCloses = new Pair(companyName,year);
-			Float startCloses = companyYearStartQuotation.get(companyYearStartCloses);
+			Float startCloses = this.companyYearStartQuotation.get(companyYearStartCloses);
 			if(startCloses != null)
 				startCloses += actionFirstClose;
 			else
@@ -138,7 +135,7 @@ public class Job3JoinReducer extends Reducer<Text, Text, Text, Text>{
 			this.companyYearStartQuotation.put(companyYearStartCloses, startCloses);
 
 			Pair companyYearEndCloses = new Pair(companyName,year);
-			Float endCloses = companyYearEndQuotation.get(companyYearEndCloses);
+			Float endCloses = this.companyYearEndQuotation.get(companyYearEndCloses);
 			if(endCloses != null)
 				endCloses += actionLastClose;
 			else

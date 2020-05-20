@@ -2,7 +2,7 @@ package hadoop.ex1;
 
 import org.apache.hadoop.mapreduce.Reducer;
 
-import utilities.Result_Job1;
+import utilities.Result_Ex1;
 import utilities.Utilities;
 
 import java.io.IOException;
@@ -13,15 +13,15 @@ import java.util.List;
 
 import org.apache.hadoop.io.Text;
 
-public class Job1Reducer extends Reducer<Text, Text, Text, Text>{
+public class Ex1Reducer extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
-	private List<Result_Job1> results;
+	private List<Result_Ex1> results;
 
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
 		context.write(new Text("TICKER"), new Text("VARIAZIONE_QUOTAZIONE_%" + COMMA + "PREZZO_MIN" + COMMA + "PREZZO_MAX" + COMMA + "VOLUME_MEDIO"));
-		results = new LinkedList<Result_Job1>();
+		results = new LinkedList<Result_Ex1>();
 	}
 	
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
@@ -79,13 +79,13 @@ public class Job1Reducer extends Reducer<Text, Text, Text, Text>{
 
 		String ticker = key.toString();
 
-		results.add(new Result_Job1(ticker,percentageChange,minPrice,maxPrice,avgVolume));
+		results.add(new Result_Ex1(ticker,percentageChange,minPrice,maxPrice,avgVolume));
 	}
 
 	@Override
 	protected void cleanup(Context context) throws IOException, InterruptedException{
 		Collections.sort(results);
-		for(Result_Job1 r : results) {
+		for(Result_Ex1 r : results) {
 			context.write(	new Text(	r.getTicker()), 
 					new Text(r.toString()));
 		}

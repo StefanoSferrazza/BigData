@@ -15,7 +15,7 @@ import org.apache.spark.sql.SparkSession;
 
 import scala.Tuple2;
 import scala.Tuple8;
-import utilities.Result_Job1;
+import utilities.Result_Ex1;
 import utilities.Utilities;
 
 public class Job1_spark {
@@ -121,7 +121,7 @@ public class Job1_spark {
 		
 		//PRODUCE RESULTS
 		
-		Function<Tuple2<String, Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>>, Result_Job1> produceResults =
+		Function<Tuple2<String, Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>>, Result_Ex1> produceResults =
 				t -> {
 					
 					String ticker = t._1();
@@ -140,7 +140,7 @@ public class Job1_spark {
 					long counter = t._2()._8();
 					long avgVolume = sumVolume / counter;
 
-					return new Result_Job1(ticker, percentageChange, minPrice, maxPrice, avgVolume);
+					return new Result_Ex1(ticker, percentageChange, minPrice, maxPrice, avgVolume);
 					
 				};
 				
@@ -149,9 +149,9 @@ public class Job1_spark {
 				/*PER ORDINARE PER ORDINE DECRESCENTE USA sortByKey([ascending], [numTasks])   
 				 * FACENDO RESTITUIRE PRIMA DELLE COPPIE CHIAVE VALORE DOVE LA CHIAVE È LA VARIAZIONE CON IL MENO DAVANTI*/
 		
-		JavaRDD<Result_Job1> results = resultsReduntant.map(produceResults).sortBy(f -> f, true, 1);
+		JavaRDD<Result_Ex1> results = resultsReduntant.map(produceResults).sortBy(f -> f, true, 1);
 		
-        List<Result_Job1> listCsvLines = results.collect();
+        List<Result_Ex1> listCsvLines = results.collect();
         
         
         /*SCRIVE IN OUTPUT*/
@@ -162,7 +162,7 @@ public class Job1_spark {
         String header = "TICKER" + COMMA + "VARIAZIONE_QUOTAZIONE_%" + COMMA + "PREZZO_MIN" + COMMA + "PREZZO_MAX" + COMMA + "VOLUME_MEDIO";
         writer.write(header + System.lineSeparator());
         
-        for(Result_Job1 res: listCsvLines) {
+        for(Result_Ex1 res: listCsvLines) {
         	writer.write(res.getTicker() + COMMA + res.toString() + System.lineSeparator());
         }
         writer.close();

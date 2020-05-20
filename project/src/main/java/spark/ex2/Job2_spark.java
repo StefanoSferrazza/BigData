@@ -21,7 +21,7 @@ import scala.Tuple4;
 import scala.Tuple6;
 import scala.Tuple7;
 import scala.Tuple9;
-import utilities.Result_Job1;
+import utilities.Result_Ex1;
 import utilities.Utilities;
 
 public class Job2_spark {

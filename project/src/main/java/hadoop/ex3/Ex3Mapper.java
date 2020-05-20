@@ -7,7 +7,6 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 
 
-
 /**
  * 
  * 
@@ -16,7 +15,7 @@ import org.apache.hadoop.mapreduce.Mapper;
  * 
  *
  */
-public class Job3Mapper extends Mapper<Text, Text, Text, Text>{
+public class Ex3Mapper extends Mapper<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 
@@ -29,7 +28,6 @@ public class Job3Mapper extends Mapper<Text, Text, Text, Text>{
 
 			if(tokens.length == 3)
 				context.write(new Text(line), new Text(key));
-
 		}
 		catch (Exception e) {
 			return;

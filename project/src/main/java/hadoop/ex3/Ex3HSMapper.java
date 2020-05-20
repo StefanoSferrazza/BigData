@@ -16,7 +16,7 @@ import utilities.Utilities;
  * 
  *
  */
-public class Job3HSMapper extends Mapper<LongWritable, Text, Text, Text>{
+public class Ex3HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HS = "hs";

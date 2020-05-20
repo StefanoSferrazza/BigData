@@ -8,7 +8,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.apache.hadoop.io.WritableComparable;
 
-public class Job1TupleWritable implements WritableComparable<Job1TupleWritable>{
+public class Ex1TupleWritable implements WritableComparable<Ex1TupleWritable>{
 
 
 	private LocalDate date;
@@ -21,11 +21,11 @@ public class Job1TupleWritable implements WritableComparable<Job1TupleWritable>{
 	
 	private float volume;
 
-	public Job1TupleWritable() {
+	public Ex1TupleWritable() {
 		
 	}
 	
-	public Job1TupleWritable(LocalDate date, float close, float low, float high, float volume) {
+	public Ex1TupleWritable(LocalDate date, float close, float low, float high, float volume) {
 		this.date = date;
 		this.close = close;
 		this.low = low;
@@ -114,7 +114,7 @@ public class Job1TupleWritable implements WritableComparable<Job1TupleWritable>{
 	
 	
 	//*******************************************************************
-	public int compareTo(Job1TupleWritable j) {
+	public int compareTo(Ex1TupleWritable j) {
 		return this.date.compareTo(j.getDate());
 	}	
 	//*******************************************************************
@@ -158,7 +158,7 @@ public class Job1TupleWritable implements WritableComparable<Job1TupleWritable>{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Job1TupleWritable other = (Job1TupleWritable) obj;
+		Ex1TupleWritable other = (Ex1TupleWritable) obj;
 		if (Float.floatToIntBits(close) != Float.floatToIntBits(other.close))
 			return false;
 		if (date == null) {

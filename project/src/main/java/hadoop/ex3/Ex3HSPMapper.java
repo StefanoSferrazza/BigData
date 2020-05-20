@@ -15,7 +15,7 @@ import utilities.Utilities;
  *
  *
  */
-public class Job3HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
+public class Ex3HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 
 	private static final String COMMA = ",";
@@ -42,7 +42,6 @@ public class Job3HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 						context.write(new Text(tokens[0]), new Text(SEPARATOR_HSP + COMMA + tokens[2] + COMMA + tokens[7]));
 					}
 				}
-
 			}
 		}
 		catch (Exception e) {

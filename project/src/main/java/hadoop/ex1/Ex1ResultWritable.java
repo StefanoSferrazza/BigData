@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.WritableComparable;
 
-public class Job1ResultWritable implements WritableComparable<Job1ResultWritable>{
+public class Ex1ResultWritable implements WritableComparable<Ex1ResultWritable>{
 
 //	private String symbol;
 	
@@ -19,11 +19,11 @@ public class Job1ResultWritable implements WritableComparable<Job1ResultWritable
 	
 	private float avgVolume;
 
-	public Job1ResultWritable() {
+	public Ex1ResultWritable() {
 		
 	}
 	
-	public Job1ResultWritable(
+	public Ex1ResultWritable(
 						float percentageChange, 
 						float minPrice, 
 						float maxPrice, 
@@ -81,7 +81,7 @@ public class Job1ResultWritable implements WritableComparable<Job1ResultWritable
 		this.avgVolume = in.readFloat();
 	}
 
-	public int compareTo(Job1ResultWritable o) {
+	public int compareTo(Ex1ResultWritable o) {
 		((Float)this.percentageChange).compareTo(o.getPercentageChange());
 		return 0;
 	}
@@ -116,7 +116,7 @@ public class Job1ResultWritable implements WritableComparable<Job1ResultWritable
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Job1ResultWritable other = (Job1ResultWritable) obj;
+		Ex1ResultWritable other = (Ex1ResultWritable) obj;
 		if (Float.floatToIntBits(avgVolume) != Float.floatToIntBits(other.avgVolume))
 			return false;
 		if (Float.floatToIntBits(maxPrice) != Float.floatToIntBits(other.maxPrice))

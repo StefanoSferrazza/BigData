@@ -2,7 +2,7 @@ package utilities;
 
 import java.io.Serializable;
 
-public class Result_Job1 implements Comparable<Result_Job1>,Serializable{
+public class Result_Ex1 implements Comparable<Result_Ex1>,Serializable{
 
 	/**
 	 * 
@@ -17,7 +17,7 @@ public class Result_Job1 implements Comparable<Result_Job1>,Serializable{
 	private Float maxPrice;
 	private Long avgVolume;
 	
-	public Result_Job1(String ticker, Integer percentageChange, Float minPrice, Float maxPrice, Long avgVolume) {
+	public Result_Ex1(String ticker, Integer percentageChange, Float minPrice, Float maxPrice, Long avgVolume) {
 		this.ticker = ticker;
 		this.percentageChange = percentageChange;
 		this.minPrice = minPrice;
@@ -25,7 +25,7 @@ public class Result_Job1 implements Comparable<Result_Job1>,Serializable{
 		this.avgVolume = avgVolume;
 	}
 
-	public int compareTo(Result_Job1 r) {
+	public int compareTo(Result_Ex1 r) {
 		return r.getPercentageChange().compareTo(this.percentageChange);		//ordine decrescente
 	}
 	
@@ -59,7 +59,7 @@ public class Result_Job1 implements Comparable<Result_Job1>,Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Result_Job1 other = (Result_Job1) obj;
+		Result_Ex1 other = (Result_Ex1) obj;
 		if (avgVolume == null) {
 			if (other.avgVolume != null)
 				return false;
