@@ -15,13 +15,13 @@ public class Ex2MapperSector_withCompany extends Mapper<Text,Text,Text,Text>{
 		try {			
 
 			String keys = key.toString();
-			String[] tokensKeys = keys.split(COMMA);
+			String[] tokensKeys = keys.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 			if(tokensKeys[0].equals("")) {
 				throw new Exception();				//controlla che al precedente recuder sia stato inserito correttamente un settore
 			}
 			else {
 				String line = value.toString();
-				String[] tokens = line.split(COMMA);
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
 				if(tokens.length==4)
 					context.write(new Text(keys), new Text(line));

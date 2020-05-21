@@ -22,7 +22,7 @@ public class Ex2ReducerCompany_withCompany extends Reducer<Text,Text,Text,Text>{
 			String sector = "";
 			for(Text value : values) {
 				String line = value.toString();
-				String[] tokens = line.split(COMMA);
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				if(tokens.length==6) {
 					sumYearVolumeCompany += Long.parseLong(tokens[0]);
 					sumLastCloses += Float.parseFloat(tokens[1]);
@@ -36,7 +36,7 @@ public class Ex2ReducerCompany_withCompany extends Reducer<Text,Text,Text,Text>{
 			float yearVarCompany = ((sumLastCloses-sumFirstCloses)/sumFirstCloses)*100;
 			float avgDailyCloseCompany = sumDailyCloses/yearRowsEachTicker;
 			
-			String[] keys = key.toString().split(COMMA);
+			String[] keys = key.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 			
 //			<(sector,year), (sumYearVolumeCompany,yearVarCompany,avgDailyCloseCompany,counterCompanies)>
 			context.write(new Text(sector + COMMA + keys[1]), new Text(sumYearVolumeCompany + COMMA + yearVarCompany + COMMA + avgDailyCloseCompany + COMMA + 1));

@@ -138,11 +138,7 @@ public class Ex1_spark {
 					return new Result_Ex1(ticker, percentageChange, minPrice, maxPrice, avgVolume);
 					
 				};
-				
-				//percentageChange, ticker + COMMA + percentageChange + COMMA + minPrice + COMMA + maxPrice + COMMA + avgVolume
-				
-				/*PER ORDINARE PER ORDINE DECRESCENTE USA sortByKey([ascending], [numTasks])   
-				 * FACENDO RESTITUIRE PRIMA DELLE COPPIE CHIAVE VALORE DOVE LA CHIAVE È LA VARIAZIONE CON IL MENO DAVANTI*/
+								
 		
 		JavaRDD<Result_Ex1> results = resultsReduntant.map(produceResults).sortBy(f -> f, true, 1);
 		

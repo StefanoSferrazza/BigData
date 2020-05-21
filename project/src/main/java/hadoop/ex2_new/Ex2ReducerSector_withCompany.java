@@ -27,7 +27,7 @@ public class Ex2ReducerSector_withCompany extends Reducer<Text,Text,Text,Text>{
 
 			for(Text value : values) {
 				String line = value.toString();
-				String[] tokens = line.split(COMMA);
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				if(tokens.length==4) {
 					sumVolume+=Long.parseLong(tokens[0]);
 					sumVar+=Float.parseFloat(tokens[1]);
