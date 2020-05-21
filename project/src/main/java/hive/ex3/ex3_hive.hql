@@ -83,7 +83,26 @@ ORDER BY size(comp_list) desc;
 
 
 
+---------- VERSION WITH BETTER OUTPUT FORMAT ----------
+DROP TABLE if exists ex3_hive;
 
+CREATE TABLE ex3_hive
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
+AS
+SELECT size(comp_list) as num_companies,
+	   CONCAT ("{", CONCAT_WS(';', comp_list), "}") as companies,
+	   quot_years
+FROM ( SELECT COLLECT_SET(company) as comp_list,
+	          quot_years
+	   FROM ( SELECT company,
+	   				 CONCAT_WS(';', quot_years) as quot_years
+			  FROM company_quotationyear
+			  WHERE size(quot_years)==3
+	   		) comp_totquot
+	   GROUP BY quot_years
+	 ) ex3_hive_tot
+WHERE size(comp_list)>1
+ORDER BY size(comp_list) desc;
 
 
 
@@ -156,6 +175,9 @@ FROM company_quotationyear c1 JOIN company_quotationyear c2
 WHERE c1.year = '2016' and c2.year = '2017' and c3.year = '2018'
 GROUP BY c1.delta_quot, c2.delta_quot, c3.delta_quot
 HAVING count(*) > 1;
+
+
+
 
 
 	
