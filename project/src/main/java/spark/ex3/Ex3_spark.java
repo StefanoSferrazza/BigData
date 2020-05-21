@@ -183,63 +183,77 @@ public class Ex3_spark {
 		
 		
 		PairFunction<	Tuple2<String, Tuple2<Float,Float>>,
-						String, Tuple3<Float,Float,Float>> map_calculateVarPercCompanyYear_changeKeyToCompany =
-					tuple -> {
-						
-						String[] oldKey = tuple._1.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-						String company = oldKey[0];			
-						Integer year = Integer.parseInt(oldKey[1]);
-						
-						Float sumFirstCloses = tuple._2._1();
-						Float sumLastCloses = tuple._2._2();
-						
-						Float varYear = ((sumLastCloses - sumFirstCloses) / sumFirstCloses)*100;
-						
-						Float varYear2016 = 0f;
-						Float varYear2017 = 0f;
-						Float varYear2018 = 0f;
-						
-						if(year==2016)
-							varYear2016 = varYear;
-						if(year==2017)
-							varYear2017 = varYear;
-						if(year==2018)
-							varYear2018 = varYear;
-						
-						return new Tuple2<>(company, new Tuple3<>(varYear2016,varYear2017,varYear2018));
-						
-		};
+		String, Tuple3<Integer,Integer,Integer>> map_calculateVarPercCompanyYear_changeKeyToCompany =
+			tuple -> {
 		
+				String[] oldKey = tuple._1.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
+				String company = oldKey[0];			
+				Integer year = Integer.parseInt(oldKey[1]);
 
+				Float sumFirstCloses = tuple._2._1();
+				Float sumLastCloses = tuple._2._2();
+
+				Integer varYear = (int)(((sumLastCloses - sumFirstCloses) / sumFirstCloses)*100);
+
+				Integer varYear2016 = null;
+				Integer varYear2017 = null;
+				Integer varYear2018 = null;
+
+				if(year==2016)
+					varYear2016 = varYear;
+				if(year==2017)
+					varYear2017 = varYear;
+				if(year==2018)
+					varYear2018 = varYear;
+
+				return new Tuple2<>(company, new Tuple3<>(varYear2016,varYear2017,varYear2018));
+
+		};
+
+
+		Function2<	Tuple3<Integer,Integer,Integer>,
+					Tuple3<Integer,Integer,Integer>,
+					Tuple3<Integer,Integer,Integer> > reduce_unifyTrends =
+				(tuple1,tuple2) -> {
 		
-		Function2<	Tuple3<Float,Float,Float>,
-					Tuple3<Float,Float,Float>,
-					Tuple3<Float,Float,Float> > reduce_unifyTrends =
-					(tuple1,tuple2) -> {
-						
-						Float varYear2016 = tuple1._1();
-						Float varYear2017 = tuple1._2();
-						Float varYear2018 = tuple1._3();
-						
-						if(varYear2016==0) {
-							varYear2016=tuple2._1();
-						}
-						if(varYear2017==0) {
-							varYear2017=tuple2._2();
-						}
-						if(varYear2018==0) {
-							varYear2018=tuple2._3();
-						}
-						
-						return new Tuple3<>(varYear2016,varYear2017,varYear2018);
+					Integer varYear2016 = tuple1._1();
+					Integer varYear2017 = tuple1._2();
+					Integer varYear2018 = tuple1._3();
+
+					if(varYear2016==null) {
+						varYear2016=tuple2._1();
+					}
+					if(varYear2017==null) {
+						varYear2017=tuple2._2();
+					}
+					if(varYear2018==null) {
+						varYear2018=tuple2._3();
+					}
+
+					return new Tuple3<>(varYear2016,varYear2017,varYear2018);
+		};
+
+		Function<Tuple2<String,Tuple3<Integer,Integer,Integer>>,Boolean> checkAllYearPresent = 
+				tuple -> {
+					if(		tuple._2._1()==null || 
+							tuple._2._2()==null || 
+							tuple._2._3()==null) {
+						return false;
+					}
+					else
+						return true;
 		};
 		
-		PairFunction<	Tuple2<String,Tuple3<Float,Float,Float>>,
+		PairFunction<	Tuple2<String,Tuple3<Integer,Integer,Integer>>,
 		Tuple3<Integer,Integer,Integer>, String> invertKey_fromCompany_toVarYear =
 			tuple -> {
-				Integer varYear2016 = Math.round(tuple._2()._1());
-				Integer varYear2017 = Math.round(tuple._2()._2());
-				Integer varYear2018 = Math.round(tuple._2()._3());
+//				Integer varYear2016 = Math.round(tuple._2()._1());
+//				Integer varYear2017 = Math.round(tuple._2()._2());
+//				Integer varYear2018 = Math.round(tuple._2()._3());
+				
+				Integer varYear2016 = tuple._2()._1();
+				Integer varYear2017 = tuple._2()._2();
+				Integer varYear2018 = tuple._2()._3();
 				
 				String company = tuple._1();
 				return new Tuple2<>(new Tuple3<>(varYear2016,varYear2017,varYear2018), company);
@@ -249,7 +263,7 @@ public class Ex3_spark {
 					String,
 					String	> reduce_companySameTrend =
 					(tuple1, tuple2) -> {
-						return tuple1 + SEMICOLON + tuple2;
+						return tuple1 + COMMA + tuple2;
 		};
 		
 		
@@ -257,7 +271,7 @@ public class Ex3_spark {
 						Integer,
 						Tuple2<Tuple3<Integer,Integer,Integer>, String>> mapByNumberSimilarCompaniesTrend =
 						tuple	->	{
-							Integer similarities = tuple._2.split(SEMICOLON).length;
+							Integer similarities = tuple._2.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)").length;
 							return new Tuple2<>(similarities,tuple);
 						};
 		
@@ -276,6 +290,7 @@ public class Ex3_spark {
 																				.reduceByKey(reduce_sumFirstLastCloses)
 																				.mapToPair(map_calculateVarPercCompanyYear_changeKeyToCompany)
 																				.reduceByKey(reduce_unifyTrends)
+																				.filter(checkAllYearPresent)
 																				.mapToPair(invertKey_fromCompany_toVarYear)
 																				.reduceByKey(reduce_companySameTrend)
 																				.mapToPair(mapByNumberSimilarCompaniesTrend)
