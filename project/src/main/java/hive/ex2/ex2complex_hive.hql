@@ -10,10 +10,11 @@ SELECT hs.ticker,
 	   MIN(day) as firstdate_ticker,
 	   MAX(day) as lastdate_ticker,
 	   SUM(close) as totclose_ticker,
-	   COUNT(*) as totcount_ticker	   							-- not sure it works
+	   COUNT(*) as totcount_ticker
 FROM historical_stocks hs JOIN historical_stock_prices hsp
 	 ON hs.ticker = hsp.ticker
 WHERE year(day) between '2008' and '2018'
+	  and sector != 'N/A'
 GROUP BY hs.ticker, company, sector, year(day);
 
 
@@ -61,7 +62,7 @@ SELECT company,
 	   year,
 	   totvolume_company,
 	   (((lastcloses_company - firstcloses_company) / firstcloses_company) * 100) as delta_quot,
-	   (totclose_company / totcount_company) as avg_dailyquot 	   -- not sure it works
+	   (totclose_company / totcount_company) as avg_dailyquot
 FROM ( SELECT company,
 	          sector,
 	   		  year,
@@ -83,9 +84,9 @@ ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT sector,
 	   year,
-       ROUND(AVG(totvolume_company), 2) as avg_volume, 	-- not sure it works
-       ROUND(AVG(delta_quot), 2) as delta_quot,   		-- not sure it works
-       ROUND(AVG(avg_dailyquot), 2) as avg_dailyquot   	-- not sure it works
+       ROUND(AVG(totvolume_company), 2) as avg_volume,
+       ROUND(AVG(delta_quot), 2) as delta_quot,
+       ROUND(AVG(avg_dailyquot), 2) as avg_dailyquot
 FROM company_quotationyear
 GROUP BY sector, year;
 
