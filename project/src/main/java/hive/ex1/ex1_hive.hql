@@ -21,7 +21,7 @@ CREATE TABLE ex1_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT tfc.ticker as ticker,
-       ROUND(((tlc.last_close - tfc.first_close)/tfc.first_close)*100, 2) as delta_quot,
+       ROUND(((tlc.last_close - tfc.first_close)/tfc.first_close)*100, 0) as delta_quot,
 	   tflv.min_close as min_close,
 	   tflv.max_close as max_close,
 	   tflv.avg_volume as avg_volume
@@ -71,7 +71,7 @@ CREATE TABLE ex1_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT tfc.ticker as ticker,
-       ROUND(((tlc.last_close - tfc.first_close)/tfc.first_close)*100, 2) as delta_quot,
+       ROUND(((tlc.last_close - tfc.first_close)/tfc.first_close)*100, 0) as delta_quot,
 	   tflv.min_close as min_close,
 	   tflv.max_close as max_close,
 	   tflv.avg_volume as avg_volume
