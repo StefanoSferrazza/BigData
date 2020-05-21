@@ -31,7 +31,7 @@ public class Ex3Reducer extends Reducer<Text,Text,Text,Text>{
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
 
-		context.write(new Text("n. aziende trend comune" + COMMA + "{AZIENDE_CON_TREND_COMUNE}:") , new Text("2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%"));
+		context.write(new Text("n. aziende trend comune" + COMMA + "{AZIENDE_CON_TREND_COMUNE}:" + COMMA) , new Text("2016: VAR_ANN_%" + COMMA + "2017: VAR_ANN_%" + COMMA + "2018: VAR_ANN_%"));
 	}
 
 

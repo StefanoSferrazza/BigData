@@ -20,7 +20,7 @@ public class Ex1Reducer extends Reducer<Text, Text, Text, Text>{
 
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
-		context.write(new Text("TICKER"), new Text("VARIAZIONE_QUOTAZIONE_%" + COMMA + "PREZZO_MIN" + COMMA + "PREZZO_MAX" + COMMA + "VOLUME_MEDIO"));
+		context.write(new Text("TICKER" + COMMA), new Text("VARIAZIONE_QUOTAZIONE_%" + COMMA + "PREZZO_MIN" + COMMA + "PREZZO_MAX" + COMMA + "VOLUME_MEDIO"));
 		results = new LinkedList<Result_Ex1>();
 	}
 	

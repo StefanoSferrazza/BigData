@@ -13,7 +13,7 @@ public class Ex2ReducerSector_withCompany extends Reducer<Text,Text,Text,Text>{
 	
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
-		context.write(new Text("SETTORE" + COMMA + "ANNO"), new Text("VOLUME_ANNUALE_MEDIO" + COMMA + "VARIAZIONE_ANNUALE_MEDIA_%" + COMMA + "QUOTAZIONE_GIORNALIERA_MEDIA"));
+		context.write(new Text("SETTORE" + COMMA + "ANNO" + COMMA), new Text("VOLUME_ANNUALE_MEDIO" + COMMA + "VARIAZIONE_ANNUALE_MEDIA_%" + COMMA + "QUOTAZIONE_GIORNALIERA_MEDIA"));
 	}
 	
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
