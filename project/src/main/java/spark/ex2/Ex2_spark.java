@@ -279,7 +279,8 @@ public class Ex2_spark {
 		JavaRDD<String> results = 	aggregationOnTicker.reduceByKey(reduce_sumVolumeCompany_SumFirstLastCloseCompany_sumCloseSumCounterCompany)
 														.mapToPair(map_varYearCompany_dailyQuotCompany_fromCompanyToSector)
 														.reduceByKey(reduce_sumVolumes_sumVars_sumQuots)
-														.map(map_avgSector);
+														.map(map_avgSector)
+														.sortBy(f -> f, true, 1);
 		
         List<String> listCsvLines = results.collect();
 		
