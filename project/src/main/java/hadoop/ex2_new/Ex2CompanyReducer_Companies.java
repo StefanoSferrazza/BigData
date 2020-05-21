@@ -6,14 +6,13 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 
-public class Ex2ReducerCompany_withCompany extends Reducer<Text,Text,Text,Text>{
+public class Ex2CompanyReducer_Companies extends Reducer<Text,Text,Text,Text>{
 
 	private static final String COMMA = ",";
 	
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 		//	<(company,year), (sumVolume,lastClose,firstClose,sumDailyClose,yearRow,sector)>
 		try {
-			
 			long sumYearVolumeCompany = 0;
 			float sumLastCloses = 0;
 			float sumFirstCloses = 0;

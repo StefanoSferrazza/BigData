@@ -39,7 +39,7 @@ AS
 SELECT tmp.sector as sector, 
        tmp.year as year,
        cast(AVG(tmp.volumes) as BIGINT) as avgVolume, 
-       ROUND(AVG(((ts.close - first_close) / first_close) * 100), 2),
+       ROUND(AVG(((ts.close - first_close) / first_close) * 100), 2) as delta_quot,
        ROUND(SUM(tmp.closes) / SUM(num), 2)
 FROM
 	 ( SELECT ty.ticker,

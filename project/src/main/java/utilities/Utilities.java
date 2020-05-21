@@ -21,7 +21,7 @@ public class Utilities {
 	}
 	
 	public static boolean inputExists(String input) {
-		return !(input.isEmpty() || input.equals(" ") || input.equals("N/A") || input==null );
+		return !(input==null || input.isEmpty() || input.equals(" ") || input.equals("N/A"));
 	}
 
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {

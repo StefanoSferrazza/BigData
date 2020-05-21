@@ -13,6 +13,14 @@ import java.util.List;
 
 import org.apache.hadoop.io.Text;
 
+
+/**
+ * 
+ * 
+ * 
+ * 
+ *
+ */
 public class Ex1Reducer extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";

@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_new;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -6,8 +6,9 @@ import java.util.HashMap;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 
-public class JoinReducer extends Reducer<Text, Text, Text, Text>{
+public class Ex2JoinReducer_Companies extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HS = "historical_stock";
@@ -26,6 +27,7 @@ public class JoinReducer extends Reducer<Text, Text, Text, Text>{
 		HashMap<Integer, Long> yearRows = new HashMap<Integer, Long>();
 
 		String sector = "";
+		String company = "";
 
 		for(Text value : values) {
 
@@ -34,11 +36,11 @@ public class JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 
 			if(tokens[0].equals(SEPARATOR_HS)) {
-				sector = tokens[1];
+				company = tokens[1];
+				sector = tokens[2];
 			}
 
 			else if(tokens[0].equals(SEPARATOR_HSP)) {
-
 				float close = Float.parseFloat(tokens[1]);
 				long volume = Long.parseLong(tokens[2]);
 				LocalDate date = LocalDate.parse(tokens[3]);
@@ -81,7 +83,7 @@ public class JoinReducer extends Reducer<Text, Text, Text, Text>{
 			}
 		}
 
-		if(!sector.equals("")) {			//corrisponderebbe a dati non contenenti "sector" in "historical_stocks"
+		if(!sector.equals("")) {	//corrisponderebbe a dati non contenenti "sector" in "historical_stocks"
 			for(Integer year : yearFirstClose.keySet()) {
 
 				long sumVolume = yearSumVolume.get(year);
@@ -95,13 +97,8 @@ public class JoinReducer extends Reducer<Text, Text, Text, Text>{
 //				float avgDailyClose = sumDailyClose/yearRow;
 
 
-
-				//	<(sector,year), (sumVolume,yearPercentageVariation,avgDailyClose)>
-				
-				
-//				context.write(new Text(sector + COMMA + year), new Text(sumVolume + COMMA + yearPercentageVariation + COMMA + avgDailyClose));
-				
-				context.write(new Text(sector + COMMA + year), new Text(sumVolume + COMMA + lastClose + COMMA + firstClose + COMMA + sumDailyClose + COMMA + yearRow));
+				//	<(company,year), (sumVolume,lastClose,firstClose,sumDailyClose,yearRow,sector)>				
+				context.write(new Text(company + COMMA + year), new Text(sumVolume + COMMA + lastClose + COMMA + firstClose + COMMA + sumDailyClose + COMMA + yearRow + COMMA + sector));
 			}
 		}
 	}

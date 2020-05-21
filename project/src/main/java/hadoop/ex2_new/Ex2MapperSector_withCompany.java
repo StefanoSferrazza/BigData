@@ -13,7 +13,6 @@ public class Ex2MapperSector_withCompany extends Mapper<Text,Text,Text,Text>{
 	public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
 
 		try {			
-
 			String keys = key.toString();
 			String[] tokensKeys = keys.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 			if(tokensKeys[0].equals("")) {

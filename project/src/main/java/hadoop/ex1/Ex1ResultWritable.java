@@ -6,6 +6,14 @@ import java.io.IOException;
 
 import org.apache.hadoop.io.WritableComparable;
 
+
+/**
+ * 
+ * 
+ * 
+ * 
+ *
+ */
 public class Ex1ResultWritable implements WritableComparable<Ex1ResultWritable>{
 
 //	private String symbol;

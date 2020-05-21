@@ -39,14 +39,14 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 			this.year = year;
 		}
 
-		
+
 		@Override
 		public boolean equals(Object obj) {
 			Pair pair = (Pair) obj;
 			return this.companyName.equals(pair.companyName) &&
 					this.year.equals(pair.year);
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return this.companyName.hashCode() + this.year.hashCode();
@@ -54,11 +54,11 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 
 		public int compareTo(Pair p) {								// !!!!!!!!!!!!!!!! DO BETTER 
-																	// with COMPARATOR
+			// with COMPARATOR
 			int i = companyName.compareTo(p.companyName);
-		    if (i != 0) 
-		    	return i;
-		    return Integer.compare(year, p.year);
+			if (i != 0) 
+				return i;
+			return Integer.compare(year, p.year);
 		}
 	}
 
@@ -82,10 +82,10 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 	@Override
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 
-		Map<Integer, Float> actionYearFirstClose = new HashMap<Integer, Float>();
-		Map<Integer, Float> actionYearLastClose = new HashMap<Integer, Float>();
 		Map<Integer, LocalDate> actionYearFirstDate = new HashMap<Integer, LocalDate>();
 		Map<Integer, LocalDate> actionYearLastDate = new HashMap<Integer, LocalDate>();
+		Map<Integer, Float> actionYearFirstClose = new HashMap<Integer, Float>();
+		Map<Integer, Float> actionYearLastClose = new HashMap<Integer, Float>();
 
 		String companyName = "";
 
@@ -110,7 +110,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 					}
 					else {
 						if(date.isBefore(actionYearFirstDate.get(year))) {						
-/*REPLACE OR PUT*/			actionYearFirstDate.replace(year,date);
+							actionYearFirstDate.replace(year,date);
 							actionYearFirstClose.replace(year,close);
 						}
 						else
@@ -121,7 +121,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 					}
 				}
 		}
-		
+
 		for(Integer year : actionYearFirstClose.keySet()) {
 			float actionFirstClose = actionYearFirstClose.get(year);
 			float actionLastClose = actionYearLastClose.get(year);
@@ -169,7 +169,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 				annualVariations = companyYear.year + COLON + companyAnnualVariation + "%";
 			this.companyAnnualVariations.put(companyYear.companyName, annualVariations);
 		}
-		
+
 		for(String companyName : this.companyAnnualVariations.keySet()) {	
 			context.write(new Text(companyName),
 					new Text(this.companyAnnualVariations.get(companyName)));	

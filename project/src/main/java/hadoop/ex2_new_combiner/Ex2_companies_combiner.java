@@ -18,14 +18,14 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import hadoop.ex2.Ex2;
-import hadoop.ex2.JoinHistoricalStockPricesMapper;
-import hadoop.ex2.JoinReducer;
-import hadoop.ex2_new.Ex2MapperCompany_withCompany;
+import hadoop.ex2.Ex2HSPMapper;
+import hadoop.ex2.Ex2JoinReducer;
+import hadoop.ex2_new.Ex2CompanyMapper_Companies;
 import hadoop.ex2_new.Ex2MapperSector_withCompany;
-import hadoop.ex2_new.Ex2ReducerCompany_withCompany;
+import hadoop.ex2_new.Ex2CompanyReducer_Companies;
 import hadoop.ex2_new.Ex2ReducerSector_withCompany;
-import hadoop.ex2_new.JoinHistoricalStocksMapper_withCompany;
-import hadoop.ex2_new.JoinReducer_withCompany;
+import hadoop.ex2_new.Ex2HSMapper_Companies;
+import hadoop.ex2_new.Ex2JoinReducer_Companies;
 
 public class Ex2_companies_combiner extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
@@ -44,11 +44,11 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 		Job join = new Job(conf, "join");
 		join.setJarByClass(Ex2_companies_combiner.class);
 
-		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, JoinHistoricalStocksMapper_withCompany.class);
-		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, JoinHistoricalStockPricesMapper.class);
+		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, Ex2HSMapper_Companies.class);
+		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, Ex2HSPMapper.class);
 		FileOutputFormat.setOutputPath(join, temp1);
 		
-		join.setReducerClass(JoinReducer_withCompany.class);
+		join.setReducerClass(Ex2JoinReducer_Companies.class);
 		join.setOutputKeyClass(Text.class);
 		join.setOutputValueClass(Text.class);
 		join.setOutputFormatClass(TextOutputFormat.class);
@@ -69,9 +69,9 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 		FileInputFormat.setInputPaths(job2Companies, temp1);
 		FileOutputFormat.setOutputPath(job2Companies, temp2);
 		
-		job2Companies.setMapperClass(Ex2MapperCompany_withCompany.class);
+		job2Companies.setMapperClass(Ex2CompanyMapper_Companies.class);
 		job2Companies.setCombinerClass(Ex2CombinerCompany_withCompany.class);
-		job2Companies.setReducerClass(Ex2ReducerCompany_withCompany.class);
+		job2Companies.setReducerClass(Ex2CompanyReducer_Companies.class);
 		
 		job2Companies.setInputFormatClass(KeyValueTextInputFormat.class);
 		job2Companies.setMapOutputKeyClass(Text.class);

@@ -8,6 +8,14 @@ import java.time.format.DateTimeFormatter;
 
 import org.apache.hadoop.io.WritableComparable;
 
+
+/**
+ * 
+ * 
+ * 
+ * 
+ *
+ */
 public class Ex1TupleWritable implements WritableComparable<Ex1TupleWritable>{
 
 
