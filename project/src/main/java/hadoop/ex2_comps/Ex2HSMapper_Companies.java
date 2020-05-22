@@ -1,28 +1,34 @@
-package hadoop.ex2_new;
+package hadoop.ex2_comps;
 
 import java.io.IOException;
 
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 
 import utilities.Utilities;
 
+
+/**
+ * 
+ * 
+ * 
+ *
+ */
 public class Ex2HSMapper_Companies extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HS = "historical_stock";
 
-	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
+	@Override
+	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
 		try {
 			if (key.get() == 0)
 				return;
 			else {
 				String line = value.toString();
-				String[] tokens = line.split(COMMA);
-				
+				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 							
 				if(tokens.length==5	&&
 	        			Utilities.inputExists(tokens[0]) &&	//ticker

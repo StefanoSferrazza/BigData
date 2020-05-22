@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_comps;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -12,9 +12,10 @@ import org.apache.hadoop.mapreduce.Reducer;
  * 
  * 
  * 
+ * 
  *
  */
-public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
+public class Ex2JoinReducer_Companies extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
 	private static final String SEPARATOR_HS = "historical_stock";
@@ -34,13 +35,15 @@ public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
 		HashMap<Integer, Long> actionYearNumRows = new HashMap<Integer, Long>();
 
 		String sector = "";
+		String company = "";
 
 		for(Text value : values) {
 			String line = value.toString();
 			String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
 			if(tokens[0].equals(SEPARATOR_HS)) {
-				sector = tokens[1];
+				company = tokens[1];
+				sector = tokens[2];
 			}
 
 			else 
@@ -60,13 +63,13 @@ public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
 						actionYearNumRows.put(year,new Long(1));
 					}
 					else {										//already initialized
-						/*update first-close*/
+						/*update first close*/
 						if(date.isBefore(actionYearFirstDate.get(year))) {						
 							actionYearFirstDate.replace(year,date);
 							actionYearFirstClose.replace(year,close);
 						}
 						else
-							/*update last-close*/
+							/*update last close*/
 							if(date.isAfter(actionYearLastDate.get(year))) {
 								actionYearLastDate.replace(year,date);						
 								actionYearLastClose.replace(year,close);
@@ -87,21 +90,18 @@ public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
 				}
 		}
 
-		if(!sector.equals("")) {	//corrisponderebbe a dati non contenenti "sector" in "historical_stocks"
+		if(!company.equals("") && !sector.equals("")) {	//corrisponderebbe a dati non contenenti "sector" in "historical_stocks"
 			for(Integer year : actionYearFirstClose.keySet()) {
 				float lastClose = actionYearLastClose.get(year);
 				float firstClose = actionYearFirstClose.get(year);
-				float yearPercentageVariation = ((lastClose-firstClose)/firstClose)*100;
 
 				long sumVolume = actionYearSumVolume.get(year);
 				float sumDailyClose = actionYearSumDailyClose.get(year);
 				long yearRow = actionYearNumRows.get(year);
 
-				//	<(sector,year), (sumVolume,yearPercentageVariation,sumDailyClose,yearRow)>
-				context.write(new Text(sector + COMMA + year), new Text(sumVolume + COMMA + yearPercentageVariation + COMMA + sumDailyClose + COMMA + yearRow));
+				//	<(company,sector,year), (sumVolume,lastClose,firstClose,sumDailyClose,yearRow)>				
+				context.write(new Text(company + COMMA + sector + COMMA + year), new Text(sumVolume + COMMA + lastClose + COMMA + firstClose + COMMA + sumDailyClose + COMMA + yearRow));
 			}
 		}
 	}
-	
-	
 }

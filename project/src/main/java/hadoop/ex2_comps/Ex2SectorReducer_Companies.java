@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_comps;
 
 import java.io.IOException;
 
@@ -10,9 +10,10 @@ import org.apache.hadoop.mapreduce.Reducer;
  * 
  * 
  * 
+ * 
  *
  */
-public class Ex2Reducer extends Reducer<Text,Text,Text,Text>{
+public class Ex2SectorReducer_Companies extends Reducer<Text,Text,Text,Text>{
 
 	private static final String COMMA = ",";
 	
@@ -24,42 +25,37 @@ public class Ex2Reducer extends Reducer<Text,Text,Text,Text>{
 	@Override
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 
-		try {			
+		try {
 			long sectorSumVolume = 0;
 			float sectorSumDeltaQuotation = 0;
 			float sectorSumDailyClose = 0;
-			long sectorYearRows = 0;
-			int counterRows = 0;
+			int counterCompanies = 0;
 
 			for(Text value : values) {
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-				if(tokens.length==4) {
+				if(tokens.length==3) {  //4) {
 					sectorSumVolume += Long.parseLong(tokens[0]);
 					sectorSumDeltaQuotation += Float.parseFloat(tokens[1]);
 					sectorSumDailyClose += Float.parseFloat(tokens[2]);
-					sectorYearRows += Long.parseLong(tokens[3]);
-					counterRows++;
+					counterCompanies ++;
 				}
 			}
 
-			Long avgSumVolume = (Long)(sectorSumVolume/counterRows);	
-			float avgDeltaQuot = sectorSumDeltaQuotation/counterRows;
-			float avgDailyClose = sectorSumDailyClose/sectorYearRows;
+			Long avgSumVolume = (Long)(sectorSumVolume / counterCompanies);
+			float avgDeltaQuot = sectorSumDeltaQuotation / counterCompanies;
+			float avgDailyClose = sectorSumDailyClose / counterCompanies;
 			
 			avgDeltaQuot = ((float)Math.round(avgDeltaQuot*100))/100;
 			avgDailyClose = ((float)Math.round(avgDailyClose*100))/100;
 			
-			String[] keys = key.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 			
 			//("SETTORE, ANNO"), ("VOLUME_ANNUALE_MEDIO,VARIAZIONE_ANNUALE_MEDIA,QUOTAZIONE_GIORNALIERA_MEDIA"));
-			context.write(new Text(keys[0] + COMMA + keys[1]), new Text(avgSumVolume + COMMA + avgDeltaQuot + "%" + COMMA + avgDailyClose));
+			context.write(new Text(key.toString()), new Text(avgSumVolume + COMMA + avgDeltaQuot + "%" + COMMA + avgDailyClose));
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 			return;
 		}
 	}
-	
-
 }

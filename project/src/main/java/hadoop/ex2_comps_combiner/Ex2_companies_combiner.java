@@ -1,4 +1,4 @@
-package hadoop.ex2_new_combiner;
+package hadoop.ex2_comps_combiner;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -20,12 +20,12 @@ import org.apache.hadoop.util.ToolRunner;
 import hadoop.ex2.Ex2;
 import hadoop.ex2.Ex2HSPMapper;
 import hadoop.ex2.Ex2JoinReducer;
-import hadoop.ex2_new.Ex2CompanyMapper_Companies;
-import hadoop.ex2_new.Ex2MapperSector_withCompany;
-import hadoop.ex2_new.Ex2CompanyReducer_Companies;
-import hadoop.ex2_new.Ex2ReducerSector_withCompany;
-import hadoop.ex2_new.Ex2HSMapper_Companies;
-import hadoop.ex2_new.Ex2JoinReducer_Companies;
+import hadoop.ex2_comps.Ex2CompanyMapper_Companies;
+import hadoop.ex2_comps.Ex2CompanyReducer_Companies;
+import hadoop.ex2_comps.Ex2HSMapper_Companies;
+import hadoop.ex2_comps.Ex2JoinReducer_Companies;
+import hadoop.ex2_comps.Ex2SectorMapper_Companies;
+import hadoop.ex2_comps.Ex2SectorReducer_Companies;
 
 public class Ex2_companies_combiner extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
@@ -96,9 +96,9 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 		FileInputFormat.setInputPaths(job2Sectors, temp2);
 		FileOutputFormat.setOutputPath(job2Sectors, output);
 		
-		job2Sectors.setMapperClass(Ex2MapperSector_withCompany.class);
+		job2Sectors.setMapperClass(Ex2SectorMapper_Companies.class);
 		job2Sectors.setCombinerClass(Ex2CombinerSector_withCompany.class);
-		job2Sectors.setReducerClass(Ex2ReducerSector_withCompany.class);
+		job2Sectors.setReducerClass(Ex2SectorReducer_Companies.class);
 		
 		job2Sectors.setInputFormatClass(KeyValueTextInputFormat.class);
 		job2Sectors.setMapOutputKeyClass(Text.class);

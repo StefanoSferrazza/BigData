@@ -15,6 +15,7 @@ FROM historical_stocks hs JOIN historical_stock_prices hsp
 	 ON hs.ticker = hsp.ticker
 WHERE year(day) between '2008' and '2018'
 	  and sector != 'N/A'
+	  and company != 'N/A'
 GROUP BY hs.ticker, company, sector, year(day);
 
 

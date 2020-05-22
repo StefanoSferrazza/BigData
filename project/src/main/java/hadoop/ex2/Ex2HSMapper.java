@@ -5,10 +5,16 @@ import java.io.IOException;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Mapper.Context;
 
 import utilities.Utilities;
 
+
+/**
+ * 
+ * 
+ * 
+ *
+ */
 public class Ex2HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";

@@ -1,4 +1,4 @@
-package hadoop.ex2_new;
+package hadoop.ex2_comps;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -86,8 +86,8 @@ public class Ex2_Companies extends Configured implements Tool{
 		FileInputFormat.setInputPaths(job2Sectors, temp2);
 		FileOutputFormat.setOutputPath(job2Sectors, output);
 		
-		job2Sectors.setMapperClass(Ex2MapperSector_withCompany.class);
-		job2Sectors.setReducerClass(Ex2ReducerSector_withCompany.class);
+		job2Sectors.setMapperClass(Ex2SectorMapper_Companies.class);
+		job2Sectors.setReducerClass(Ex2SectorReducer_Companies.class);
 		
 		job2Sectors.setInputFormatClass(KeyValueTextInputFormat.class);
 		job2Sectors.setMapOutputKeyClass(Text.class);
