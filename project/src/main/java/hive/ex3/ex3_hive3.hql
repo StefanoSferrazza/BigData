@@ -12,7 +12,7 @@ GROUP BY ticker, year(day);
 
 
 
----------- quotation - PERSONAL VERSION: sum first_close and sum last_close, then delta_quot ----------
+---------- VERSION WITH BETTER OUTPUT FORMAT ----------
 DROP TABLE if exists ticker_quotationyear;
 
 CREATE TEMPORARY TABLE ticker_quotationyear
@@ -61,13 +61,13 @@ FROM (
 GROUP BY company;
 
 
-
 DROP TABLE if exists ex3_hive;
 
 CREATE TABLE ex3_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
-SELECT CONCAT ("{", CONCAT_WS(';', comp_list), "}") as companies,
+SELECT size(comp_list) as num_companies,
+	   CONCAT ("{", CONCAT_WS(';', comp_list), "}") as companies,
 	   quot_years
 FROM ( SELECT COLLECT_SET(company) as comp_list,
 	          quot_years
