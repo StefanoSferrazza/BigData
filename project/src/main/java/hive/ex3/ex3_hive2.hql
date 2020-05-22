@@ -67,7 +67,7 @@ DROP TABLE if exists ex3_hive;
 CREATE TABLE ex3_hive
 ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
-SELECT CONCAT_WS(';', COLLECT_SET(c1.company)),
+SELECT CONCAT ("{", CONCAT_WS(';', COLLECT_SET(c1.company)), "}") as companies,
 	   c1.delta_quot as quot2016,
 	   c2.delta_quot as quot2017,
 	   c3.delta_quot as quot2018
