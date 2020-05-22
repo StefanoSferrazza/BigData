@@ -18,7 +18,7 @@ PRE-COND:
 		- HIGH 			Float		max price
 		- VOLUME 		Long		number of transactions
 		- DATE			Date 		date in format yyyy-mm-dd
-	- historical_stocks.csv needs to be a document, separated by commas, with 8 fields:
+	- historical_stocks.csv needs to be a document, separated by commas, with 5 fields:
 		- TICKER		String		unique share symbol
 		- EXCHANGE		String		NYSE or NASDAQ
 		- NAME 			String		company name
@@ -27,48 +27,75 @@ PRE-COND:
 	- temp path needs to be valid.
 	- output path needs to be valid.
 
-//("SETTORE, ANNO"), ("VOLUME_ANNUALE_MEDIO,VARIAZIONE_ANNUALE_MEDIA,QUOTAZIONE_GIORNALIERA_MEDIA"));
-
 POST-COND:
 	- output file needs to be a document, separated by commas, with 5 fields:
-		- SECTOR,YEAR					String				
-							Long					average "volume" in period 2008-2018
-	- document rows need to be sorted by descending "VARIAZIONE_QUOTAZIONE_%" 
+		- SECTOR		String
+		- YEAR			String				
+		- avgVolume				Long		average annual volume of sector	
+		- DELTA_QUOTATION_%		String  	(Integer with %)	percentage change rounded of volume
+		- avgDailyClose			Long		average daily quotation of sector
 
 
-ex1Mapper(key, value)
+SEPARATOR_HSP = "historical_stock_prices";
+SEPARATOR_HS = "historical_stock";
+
+ex2HSPMapper(key, value)
 		skip first row 											//header
 		check_correctness_data(value)							//correct types and date in correct period
 		close,volume,date <- extractRelevantValues(value)		//relevant values are "close","volume","date"
 		key <- extractTicker(value)
 		
 		if (2008 <= date.year() && date.year() <= 2018):
-			EMIT(Text ticker, Text [close_price, volume, date])
+			EMIT(Text ticker, Text [SEPARATOR_HSP,close, volume, date])
 
 
-ex1Reducer(key, values)
-		initialize firstClose, lastClose, firstDate, lastDate, 
-				   minClose, maxClose, sumVolumes, numValues
+ex2HSMapper(key, value)
+		skip first row 											//header
+		check_correctness_data(value)							//correct types and date in correct period
+		sector <- extractRelevantValues(value)					//relevant value is "sector"
+		key <- extractTicker(value)
+		
+		EMIT(Text ticker, Text [SEPARATOR_HS,close_price, volume, date])
 
+
+ex2JoinReducer(key, values)
+		initialize maps actionYearFirstDate, actionYearLastDate, actionYearFirstClose, actionYearLastClose, 
+				   actionYearSumVolume, actionYearSumDailyClose, actionYearNumRows
+		sector <- values.get(SEPARATOR_HS)
+		close,volume,date <- values.get(SEPARATOR_HSP)
+		
 		for each text in values:
-			update firstClose, lastClose, firstDate, lastDate, 
-			   	   minClose, maxClose, sumVolumes, numValues
-			if(text.date < firstDate)
-				firstDate = text.date
-				firstClose = text.close
-			if(text.date > lastDate)
-				lastDate = text.date
-				lastClose = text.close
-			if(text.close < minClose)
-				minClose = close
-			if(text.close > maxClose)
-				maxClose = close
-			sumVolumes += text.volume
-			numValues++
+			update actionYearFirstDate, actionYearLastDate, actionYearFirstClose, actionYearLastClose, 
+				   actionYearSumVolume, actionYearSumDailyClose, actionYearNumRows
+		
+		for each year in actionYearFirstClose:
+			lastClose <- actionYearLastClose.get(year)
+			firstClose <- actionYearFirstClose.get(year)
+			deltaQuotation <- ((lastClose - firstClose) / firstClose) * 100
+			
+			sumVolume <- actionYearSumVolume.get(year)
+			sumDailyClose <- actionYearSumDailyClose.get(year)
+			yearRow <- actionYearNumRows.get(year)
+		
+			EMIT(Text [sector,year], Text [sumVolume,deltaQuotation,sumDailyClose,yearRow])
 
-		percentageChange = ((lastClose - firstClose) / firstClose) * 100
-		avgVolume = sumVolumes / numValues
+
+ex2Mapper(key, value)
+		sumVolume,deltaQuotation,sumDailyClose,yearRow <- extractRelevantValues(value)
+		EMIT(Text [sector,year], Text [sumVolume,deltaQuotation,sumDailyClose,yearRow])
+
+
+ex2Reducer(key, values)
+		initialize sectorSumVolume, sectorSumDeltaQuotation, sectorSumDailyClose,
+				   sectorYearRows, counterRows
 		
-		EMIT(Text "ticker", Text [percentageChange,minClose,maxClose,avgVolume])
+		for each text in values:
+			update sectorSumVolume, sectorSumDeltaQuotation, sectorSumDailyClose,
+				   sectorYearRows, counterRows
 		
+			avgSumVolume <- sectorSumVolume/counterRows
+			avgDeltaQuot <- sectorSumDeltaQuotation/counterRows
+			avgDailyClose <- sectorSumDailyClose/sectorYearRows
+		
+			EMIT(Text [sector,year], Text [avgSumVolume,avgDeltaQuot,avgDailyClose])
 		

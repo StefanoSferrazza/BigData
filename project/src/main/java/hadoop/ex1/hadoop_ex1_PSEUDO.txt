@@ -34,7 +34,7 @@ ex1Mapper(key, value)
 		key <- extractTicker(value)
 		
 		if (2008 <= date.year() && date.year() <= 2018):
-			EMIT(Text ticker, Text [close_price, volume, date])
+			EMIT(Text ticker, Text [close, volume, date])
 
 
 ex1Reducer(key, values)

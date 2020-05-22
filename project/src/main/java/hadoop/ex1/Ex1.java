@@ -10,12 +10,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-/**
- * 
- * 
- * 
- *
- */
+
 public class Ex1 {
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {

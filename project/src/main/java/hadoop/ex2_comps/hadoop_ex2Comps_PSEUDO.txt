@@ -1,0 +1,119 @@
+HADOOP EX 2 WITH_COMPANIES
+
+INPUT: 
+	- path to document "historical_stock_prices.csv".
+	- path to document "historical_stocks.csv".
+	- path for temp results.
+	- path for output result.
+
+PRE-COND:
+	- path to historical_stock_prices.csv needs to be valid.
+	- path to historical_stocks.csv needs to be valid.
+	- historical_stock_prices.csv needs to be a document, separated by commas, with 8 fields:
+		- TICKER		String		unique share symbol
+		- OPEN			Float		open price
+		- CLOSE 		Float		close price
+		- ADJ_CLOSE 	Float		adjusted close price
+		- LOW 			Float		min price
+		- HIGH 			Float		max price
+		- VOLUME 		Long		number of transactions
+		- DATE			Date 		date in format yyyy-mm-dd
+	- historical_stocks.csv needs to be a document, separated by commas, with 5 fields:
+		- TICKER		String		unique share symbol
+		- EXCHANGE		String		NYSE or NASDAQ
+		- NAME 			String		company name
+		- SECTOR 		String		sector name
+		- INDUSTRY 		String		industry name
+	- temp paths need to be valid.
+	- output path needs to be valid.
+
+POST-COND:
+	- output file needs to be a document, separated by commas, with 5 fields:
+		- SECTOR		String
+		- YEAR			String				
+		- avgVolume				Long		average annual volume of sector	
+		- DELTA_QUOTATION_%		String  	(Integer with %)	percentage change rounded of volume
+		- avgDailyClose			Long		average daily quotation of sector
+
+
+SEPARATOR_HSP = "historical_stock_prices";
+SEPARATOR_HS = "historical_stock";
+
+ex2HSPMapper(key, value)
+		skip first row 											//header
+		check_correctness_data(value)							//correct types and date in correct period
+		close,volume,date <- extractRelevantValues(value)		//relevant values are "close","volume","date"
+		key <- extractTicker(value)
+		
+		if (2008 <= date.year() && date.year() <= 2018):
+			EMIT(Text ticker, Text [SEPARATOR_HSP,close, volume, date])
+
+
+ex2HSMapper(key, value)
+		skip first row 											//header
+		check_correctness_data(value)							//correct types and date in correct period
+		sector <- extractRelevantValues(value)					//relevant value is "sector"
+		key <- extractTicker(value)
+		
+		EMIT(Text ticker, Text [SEPARATOR_HS,close_price, volume, date])
+
+
+ex2JoinReducer(key, values)
+		initialize maps actionYearFirstDate, actionYearLastDate, actionYearFirstClose, actionYearLastClose, 
+				   actionYearSumVolume, actionYearSumDailyClose, actionYearNumRows
+		company,sector <- values.get(SEPARATOR_HS)
+		close,volume,date <- values.get(SEPARATOR_HSP)
+		
+		for each text in values:
+			update actionYearFirstDate, actionYearLastDate, actionYearFirstClose, actionYearLastClose, 
+				   actionYearSumVolume, actionYearSumDailyClose, actionYearNumRows
+		
+		for each year in actionYearFirstClose:
+			lastClose <- actionYearLastClose.get(year)
+			firstClose <- actionYearFirstClose.get(year)
+			
+			sumVolume <- actionYearSumVolume.get(year)
+			sumDailyClose <- actionYearSumDailyClose.get(year)
+			yearRow <- actionYearNumRows.get(year)
+		
+			EMIT(Text [company,sector,year], Text [sumVolume,lastClose,firstClose,sumDailyClose,yearRow])
+
+
+ex2CompanyMapper(key, value)
+		sumVolume,lastClose,firstClose,sumDailyClose,yearRow <- extractRelevantValues(value)
+		EMIT(Text [sector,year], Text [sumVolume,lastClose,firstClose,sumDailyClose,yearRow])
+
+
+ex2CompanyReducer(key, values)
+		initialize companySumYearVolume, companySumLastCloses, companySumFirstCloses,
+				   companySumDailyCloses, companyYearRows
+		
+		for each text in values:
+			update companySumYearVolume, companySumLastCloses, companySumFirstCloses,
+				   companySumDailyCloses, companyYearRows
+		
+			companyDeltaQuotation <- ((companySumLastCloses-companySumFirstCloses)/companySumFirstCloses)*100
+			companyAvgDailyClose <- companySumDailyCloses/companyYearRows
+		
+			EMIT(Text [sector,year], Text [companySumYearVolume,companyDeltaQuotation,companyAvgDailyClose])
+
+
+ex2SectorMapper(key, value)
+		companySumYearVolume,companyDeltaQuotation,companyAvgDailyClose <- extractRelevantValues(value)
+		EMIT(Text [sector,year], Text [companySumYearVolume,companyDeltaQuotation,companyAvgDailyClose])
+
+
+ex2SectorReducer(key, values)
+		initialize sectorSumVolume, sectorSumDeltaQuotation, 
+		           sectorSumDailyClose, counterCompanies
+		
+		for each text in values:
+			update sectorSumVolume, sectorSumDeltaQuotation, 
+		           sectorSumDailyClose, counterCompanies
+		
+			avgSumVolume <- sectorSumVolume / counterCompanies
+			avgDeltaQuot = sectorSumDeltaQuotation / counterCompanies
+			avgDailyClose = sectorSumDailyClose / counterCompanies
+			
+			EMIT(Text [sector,year], Text [avgSumVolume,avgDeltaQuot,avgDailyClose])
+		
