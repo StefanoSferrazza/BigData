@@ -51,7 +51,7 @@ public class Ex2SectorReducer_Companies extends Reducer<Text,Text,Text,Text>{
 			
 			
 			//("SETTORE, ANNO"), ("VOLUME_ANNUALE_MEDIO,VARIAZIONE_ANNUALE_MEDIA,QUOTAZIONE_GIORNALIERA_MEDIA"));
-			context.write(new Text(key.toString()), new Text(avgSumVolume + COMMA + avgDeltaQuot + "%" + COMMA + avgDailyClose));
+			context.write(new Text(key.toString() + COMMA), new Text(avgSumVolume + COMMA + avgDeltaQuot + "%" + COMMA + avgDailyClose));
 		}
 		catch(Exception e) {
 			e.printStackTrace();

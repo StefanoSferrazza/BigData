@@ -245,12 +245,14 @@ public class Ex2_spark_singleRow {
 						Long avgVolumes = tuple._2._1() / counterCompanies;
 						
 						Float avgVars = tuple._2._2() / counterCompanies;
+						Float roundedAvgVars = ((float)Math.round(avgVars*100))/100;
 						
 						Float avgDailyQuots = tuple._2._3() / counterCompanies;
+						Float roundedAvgDailyQuots = ((float)Math.round(avgDailyQuots*100))/100;
 						
 						String companyYear = tuple._1;
 						
-						return companyYear + COMMA + avgVolumes + COMMA + avgVars + "%" + COMMA + avgDailyQuots;
+						return companyYear + COMMA + avgVolumes + COMMA + roundedAvgVars + "%" + COMMA + roundedAvgDailyQuots;
 					};
 
 			JavaPairRDD<String,Tuple2<String,String>> valuesHS = session.read().textFile(inputPathHS).javaRDD().filter(checkInputHS).mapToPair(prepareValuesHS);
