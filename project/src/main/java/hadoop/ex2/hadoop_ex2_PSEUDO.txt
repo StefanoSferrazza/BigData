@@ -1,11 +1,14 @@
-HADOOP EX 1
+HADOOP EX 2
 
 INPUT: 
 	- path to document "historical_stock_prices.csv".
+	- path to document "historical_stocks.csv".
+	- path for temp result.
 	- path for output result.
 
 PRE-COND:
 	- path to historical_stock_prices.csv needs to be valid.
+	- path to historical_stocks.csv needs to be valid.
 	- historical_stock_prices.csv needs to be a document, separated by commas, with 8 fields:
 		- TICKER		String		unique share symbol
 		- OPEN			Float		open price
@@ -15,16 +18,22 @@ PRE-COND:
 		- HIGH 			Float		max price
 		- VOLUME 		Long		number of transactions
 		- DATE			Date 		date in format yyyy-mm-dd
+	- historical_stocks.csv needs to be a document, separated by commas, with 8 fields:
+		- TICKER		String		unique share symbol
+		- EXCHANGE		String		NYSE or NASDAQ
+		- NAME 			String		company name
+		- SECTOR 		String		sector name
+		- INDUSTRY 		String		industry name
+	- temp path needs to be valid.
 	- output path needs to be valid.
+
+//("SETTORE, ANNO"), ("VOLUME_ANNUALE_MEDIO,VARIAZIONE_ANNUALE_MEDIA,QUOTAZIONE_GIORNALIERA_MEDIA"));
 
 POST-COND:
 	- output file needs to be a document, separated by commas, with 5 fields:
-		- TICKER				String					
-		- DELTA_QUOTATION_%		String  (Integer with %)	percentage change rounded of ticker value in period 2008-2018
-		- MIN_CLOSE				Float   min "close" value reported in period 2008-2018
-		- MAX_CLOSE				Float   max "close" value reported in period 2008-2018
-		- AVG_VOLUME			Long    average "volume" in period 2008-2018
-	- document rows need to be sorted by descending "DELTA_QUOTATION_%" 
+		- SECTOR,YEAR					String				
+							Long					average "volume" in period 2008-2018
+	- document rows need to be sorted by descending "VARIAZIONE_QUOTAZIONE_%" 
 
 
 ex1Mapper(key, value)
@@ -57,9 +66,9 @@ ex1Reducer(key, values)
 			sumVolumes += text.volume
 			numValues++
 
-		deltaQuotation = ((lastClose - firstClose) / firstClose) * 100
+		percentageChange = ((lastClose - firstClose) / firstClose) * 100
 		avgVolume = sumVolumes / numValues
 		
-		EMIT(Text "ticker", Text [deltaQuotation,minClose,maxClose,avgVolume])
+		EMIT(Text "ticker", Text [percentageChange,minClose,maxClose,avgVolume])
 		
 		
