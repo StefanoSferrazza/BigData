@@ -1,0 +1,189 @@
+SPARK EX 3
+
+INPUT: 
+	- path to document "historical_stock_prices.csv".
+	- path to document "historical_stocks.csv".
+	- path for output result.
+
+PRE-COND:
+	- path to historical_stock_prices.csv needs to be valid.
+	- path to historical_stocks.csv needs to be valid.
+	- historical_stock_prices.csv needs to be a document, separated by commas, with 8 fields:
+		- TICKER		String		unique share symbol
+		- OPEN			Float		open price
+		- CLOSE 		Float		close price
+		- ADJ_CLOSE 	Float		adjusted close price
+		- LOW 			Float		min price
+		- HIGH 			Float		max price
+		- VOLUME 		Long		number of transactions
+		- DATE			Date 		date in format yyyy-mm-dd
+	- historical_stocks.csv needs to be a document, separated by commas, with 5 fields:
+		- TICKER		String		unique share symbol
+		- EXCHANGE		String		NYSE or NASDAQ
+		- NAME 			String		company name
+		- SECTOR 		String		sector name
+		- INDUSTRY 		String		industry name
+	- output path needs to be valid.
+
+POST-COND:
+	- output file needs to be a document, separated by commas, with 5 fields:
+		- SIMILARITIES			String[]	list of companies with same trend in year 2016-2018
+		- TREND					Integer[3]	percentage variation of company in year 2016,2017,2018
+
+
+main
+	valuesHSP <- checkInputHSP(inputHSP).prepareValuesHSP
+	valuesHS <- checkInputHSP(inputHS).prepareValuesHS
+	
+	valuesHSP.join(valuesHS)
+				.reorganizeValuesAfterJoin
+				.reduce_findFirstLastCloses
+				.map_fromTickerToCompany
+				.reduce_sumFirstLastCloses
+				.map_calculateVarPercCompanyYear_changeKeyToCompany
+				.reduce_unifyTrends
+				.checkAllYearPresent
+				.invertKey_fromCompany_toVarYear
+				.reduce_companySameTrend
+				.mapByNumberSimilarCompaniesTrend
+				.sortBy(similarities.length);
+
+
+
+checkInputHS(line)												//filter dirty rows	
+	if(check_correctness_data(line))							//correct types 
+		return true
+	return false
+
+
+
+checkInputHSP(line)											//filter dirty rows	
+	if (check_correctness_data(line) &&						//correct types 
+			2016 <= date.year() && date.year() <= 2018):
+		return true
+	return false
+			
+	
+	
+prepareValuesHS(line)								//take relevant fields from historical_stocks
+	company,sector <- extractValues(line)\	
+	
+	key <- line.ticker
+	value <- company,sector
+	EMIT(key,value)
+
+
+
+prepareValuesHSP(line)								//take relevant fields from historical_stock_prices
+	close,volume,date <- extractValues(line)
+	
+	key <- line.ticker
+	value <- close,volume,date
+	EMIT(key, value)
+
+		
+reorganizeVa
+luesAfterJoin(tuple)					//prepare values for later computation
+	firstDate,lastDate <- tuple.date
+	firstClose,lastClose <- tuple.close
+	company <- tuple.company
+	
+	key <- tuple.ticker + tuple.year
+	value <- firstDate,lastDate,firstClose,lastClose,company
+	EMIT(key,value)
+
+
+
+reduce_findFirstLastCloses(tuple1,tuple2)			//aggregate on ticker
+	firstDate <- MIN(tuple1.date,tuple2.date)
+	lastDate <- MAX(tuple1.date,tuple2.date)
+	firstClose <- close associated to firstDate
+	lastClose <- close associated to lastDate
+	company <- tuple1.company
+	
+	value <- firstDate,lastDate,firstClose,lastClose,company
+	EMIT(value)
+
+
+
+map_fromTickerToCompany(tuple)							//change key to company
+	firstClose <- tuple.firstClose
+	lastClose <- tuple.lastClose
+	
+	key <- tuple.company + tuple.year
+	value <- firstClose,lastClose
+	EMIT(key,value)
+
+
+
+reduce_sumFirstLastCloses(tuple1,tuple2)							//aggregate on company
+	sumFirstCloses <- tuple1.firstClose + tuple2.firstClose
+	sumLastCloses <- tuple1.lastClose + tuple2.lastClose
+	
+	value <- sumFirstCloses,sumLastCloses
+	EMIT(value)
+
+
+
+map_calculateVarPercCompanyYear_changeKeyToCompany(tuple)			//calculate percentage variation and change key to company
+	varYear2016,varYear2017,varYear2018 <- null
+	varyear <- ((tuple.sumLastCloses - tuple.sumFirstCloses) / tuple.sumFirstCloses)*100
+	update correspondent VarYear variables according to tuple.year
+	
+	key <- tuple.company
+	value <- varYear2016,varYear2017,varYear2018
+	EMIT(key,value)
+
+
+
+reduce_unifyTrends(tuple1,tuple2)								//unify percentage variation of different year on a single record
+	varYear2016 <- tuple1.varYear2016
+	varYear2017 <- tuple1.varYear2017
+	varYear2018 <- tuple1.varYear2017
+	if(varYear2016==NULL)
+		varYear2016 <- tuple2.varYear2016
+	if(varYear2017==NULL)
+		varYear2017 <- tuple2.varYear2017
+	if(varYear2018==NULL)
+		varYear2018 <- tuple2.varYear2018
+		
+	value <- varYear2016,varYear2017,varYear2018
+	EMIT(value)
+	
+
+
+checkAllYearPresent(tuple)										//filter those that doesn't have var percentage for all years 2016-2017-2018
+	if(tuple.varYear2016==NULL ||
+		tuple.varYear2017==NULL ||
+		tuple.varYear2018==NULL)
+		return false
+	return true
+
+
+invertKey_fromCompany_toVarYear(tuple)						//change key to trend
+	varYear2016,varYear2017,varYear2018 <- extractValues(tuple)
+	
+	key <- varYear2016,varYear2017,varYear2018
+	value <- tuple.company
+	EMIT(key,value)
+
+
+reduce_companySameTrend(tuple1,tuple2)									//unify companies with same trend	
+	value <- tuple1.company, tuple2.company
+	EMIT(value)
+
+
+mapByNumberSimilarCompaniesTrend(tuple)								//calculate number of similarities to order results and change key to that value	
+	key <- tuple.companies.length
+	value <- tuple.companies + tuple.varYear2016 + tuple.varYear2017 + tuple.varYear2018
+	EMIT(key,value)
+
+
+
+
+
+
+
+
+
+

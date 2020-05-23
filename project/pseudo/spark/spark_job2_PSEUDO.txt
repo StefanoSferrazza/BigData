@@ -34,6 +34,9 @@ POST-COND:
 		- avgDailyClose			Long		average daily quotation of sector reported in period 2008-2018
 		
 main
+	valuesHSP <- checkInputHSP(inputHSP).prepareValuesHSP
+	valuesHS <- checkInputHSP(inputHS).prepareValuesHS
+	
 	valuesHSP.join(valuesHS)
 				.reorganizeValuesAfterJoin
 				.reduce_sumVolumesTicker_findFirstLastClose
@@ -52,6 +55,7 @@ checkInputHS(line)												//filter dirty rows
 	return false
 
 
+
 checkInputHSP(line)											//filter dirty rows	
 	if (check_correctness_data(line) &&						//correct types 
 			2008 <= date.year() && date.year() <= 2018):
@@ -59,32 +63,29 @@ checkInputHSP(line)											//filter dirty rows
 	return false
 
 
+
 prepareValuesHS(line)								//take relevant fields from historical_stocks
-	company <- line.company
-	sector <- line.sector
+	company,sector <- extractValues(line)
 	
 	key <- line.ticker
 	value <- company,sector
 	EMIT(key,value)
 
 
+
 prepareValuesHSP(line)								//take relevant fields from historical_stock_prices
-	close <- line.close
-	volume <- line.volume
-	date <- line.date
+	close,volume,date <- extractValues(line)
 	
 	key <- line.ticker
 	value <- close,volume,date
 	EMIT(key, value)
 
 
+
 reorganizeValuesAfterJoin(tuple) 							//organize values for later computation
 	volume <- tuple.volume
-	firstDate <- tuple.date
-	lastDate <- tuple.date
-	firstClose <- tuple.close
-	lastClose <- tuple.close
-	close <- tuple.close
+	firstDate,lastDate <- tuple.date
+	firstClose,lastClose,close <- tuple.close
 	counterDays <- 1
 	company <- tuple.company
 	sector <- tuple.sector
@@ -92,6 +93,7 @@ reorganizeValuesAfterJoin(tuple) 							//organize values for later computation
 	key <- tuple.ticker + tuple.year
 	value <- volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector
 	EMIT(key, value)
+
 
 
 reduce_sumVolumesTicker_findFirstLastClose(tuple1, tuple2)			//aggregate values on tickers
@@ -118,6 +120,7 @@ map_fromTickerToCompany(tuple)					//change key to company year
 	EMIT(key,value)
 
 
+
 reduce_sumVolumeCompany_SumFirstLastCloseCompany_sumCloseSumCounterCompany(tuple1, tuple2)		//aggregate on company,year
 	sumVolumeCompany <- tuple1.volume + tuple2.volume
 	sumFirstCloses <- tuple1.firstClose + tuple2.firstClose
@@ -128,6 +131,7 @@ reduce_sumVolumeCompany_SumFirstLastCloseCompany_sumCloseSumCounterCompany(tuple
 
 	value <- sumVolumeCompany,sumFirstCloses,sumLastCloses,sumCloses,sumCountersDays,sector
 	EMIT(value)
+	
 	
 	
 map_varYearCompany_dailyQuotCompany_fromCompanyToSector(tuple)			//aggregate companies and change key to sector year
@@ -141,6 +145,7 @@ map_varYearCompany_dailyQuotCompany_fromCompanyToSector(tuple)			//aggregate com
 	EMIT(key,value) 
 
 
+
 reduce_sumVolumes_sumVars_sumQuots(tuple1, tuple2)						//aggregato on sector year
 	sumVolumes <- tuple1.volume + tuple2.volume
 	sumVars <- tuple1.varYear + tuple2.varYear
@@ -150,6 +155,8 @@ reduce_sumVolumes_sumVars_sumQuots(tuple1, tuple2)						//aggregato on sector ye
 	value <- sumVolumes,sumVars,sumQuots,counterCompanies
 	EMIT(value)
 
+
+
 map_avgSector(tuple) 												//compute results
 	sectorYear <- tuple.key
 	avgVolumes <- tuple.sumVolumes / tuple.counterCompanies
@@ -158,11 +165,4 @@ map_avgSector(tuple) 												//compute results
 	
 	result <- sectorYear,avgVolumes,avgVars,avgDailyQuots
 	EMIT(result) 
-	
-	
-	
-	
-	
-	
-	
 	

@@ -29,8 +29,9 @@ POST-COND:
 	
 	
 main
-	inputData.checkline(line)
-				.prepareValues(line)
+	valuesHSP <- checkline(inputHSP).prepareValues
+	
+	valuesHSP.prepareValues(line)
 				.reducer(tuple1, tuple2)
 				.produceResults(tuple)
 				.descendentSort(result.percentageChange)
@@ -44,19 +45,17 @@ checkline(line)												//filter dirty rows
 	return false
 	
 	
+	
 prepareValues(line)											//organize data for later manipulation
-	firstDate <- line.date
-	lastDate <- line.date
-	firstClose <- line.close
-	lastClose <- line.close
-	minClose <- line.close
-	maxClose <- line.close
+	firstDate,lastDate <- line.date
+	firstClose,lastClose,minClose,maxClose <- line.close
 	volume <- line.volume
 	counter <- 1
 	
 	key <- ticker
 	value <- firstDate,lastDate,firstClose,lastClose,minClose,maxClose,volume,counter
 	EMIT(key,value)
+	
 	
 	
 reducer(tuple1, tuple2)										//aggregate on ticker
@@ -72,6 +71,8 @@ reducer(tuple1, tuple2)										//aggregate on ticker
 	value <- firstDate,lastDate,firstClose,lastClose,minClose,maxClose,sumVolume,counter
 	EMIT()
 
+
+
 produceResults(tuple)									//calculate results
 	ticker <- tuple.ticker
 	percentageChange <- ((tuple.lastClose - tuple.firstClose) / tuple.firstClose) * 100
@@ -81,27 +82,6 @@ produceResults(tuple)									//calculate results
 
 	result <- ticker, percentageChange, minPrice, maxPrice, avgVolume
 	EMIT(result)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 	
