@@ -2,7 +2,6 @@ package hadoop.ex3;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -13,9 +12,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 /**
  * 
+ * Reducer for Job Join
  * 
- * 
- *
  */
 public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
@@ -26,9 +24,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 
 	/**
-	 * 
-	 * 
-	 *
+	 * Private class which implements a Pair
 	 */
 	private class Pair implements Comparable<Pair>{
 		public String companyName;
@@ -38,7 +34,6 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 			this.companyName = companyName;
 			this.year = year;
 		}
-
 
 		@Override
 		public boolean equals(Object obj) {
@@ -52,9 +47,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 			return this.companyName.hashCode() + this.year.hashCode();
 		}
 
-
-		public int compareTo(Pair p) {								// !!!!!!!!!!!!!!!! DO BETTER 
-			// with COMPARATOR
+		public int compareTo(Pair p) {
 			int i = companyName.compareTo(p.companyName);
 			if (i != 0) 
 				return i;
@@ -63,7 +56,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 	}
 
 
-
+	/*maps to store temp results and avoid another mapreduce step*/
 	private Map<Pair, Float> companyYearStartQuotation;
 	private Map<Pair, Float> companyYearEndQuotation;
 	private Map<String, String> companyAnnualVariations;
@@ -71,7 +64,6 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 	@Override
 	protected void setup(Context context) {
-		// 		super.setup(context); 							?????????????
 		this.companyYearStartQuotation = new TreeMap<Pair, Float>();
 		this.companyYearEndQuotation = new TreeMap<Pair, Float>();
 		this.companyAnnualVariations = new HashMap<String, String>();
@@ -82,6 +74,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 	@Override
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 
+		/*maps initialization. each map is used to store a specific value respecting into a year (alternative to create an object, made to avoid too structures)*/
 		Map<Integer, LocalDate> actionYearFirstDate = new HashMap<Integer, LocalDate>();
 		Map<Integer, LocalDate> actionYearLastDate = new HashMap<Integer, LocalDate>();
 		Map<Integer, Float> actionYearFirstClose = new HashMap<Integer, Float>();
@@ -109,11 +102,13 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 						actionYearLastClose.put(year,close);
 					}
 					else {
+						/*update first close*/
 						if(date.isBefore(actionYearFirstDate.get(year))) {						
 							actionYearFirstDate.replace(year,date);
 							actionYearFirstClose.replace(year,close);
 						}
 						else
+							/*update last close*/
 							if(date.isAfter(actionYearLastDate.get(year))) {
 								actionYearLastDate.replace(year,date);						
 								actionYearLastClose.replace(year,close);
@@ -146,7 +141,9 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 
 
-
+	/**
+	 * Use cleanup method to avoid another MapReduce step
+	 */
 	@Override
 	protected void cleanup(Context context) throws IOException, InterruptedException {
 		for(Pair companyYear : this.companyYearStartQuotation.keySet()) {
@@ -155,12 +152,6 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 			int companyAnnualVariation = (int) (((companyYearEndQuotation - companyYearStartQuotation)
 					/companyYearStartQuotation)*100);
-
-
-
-			//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! CONVERT INTO INTEGER
-
-
 
 			String annualVariations = this.companyAnnualVariations.get(companyYear.companyName);
 			if(annualVariations != null)

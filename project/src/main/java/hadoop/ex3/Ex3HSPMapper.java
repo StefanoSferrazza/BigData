@@ -11,24 +11,25 @@ import utilities.Utilities;
 
 /**
  * 
- *
- *
+ * Mapper for Historical_Stock_Prices
+ * 
  */
 public class Ex3HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 
 	private static final String COMMA = ",";
-	private static final String SEPARATOR_HSP = "hsp";
+	private static final String SEPARATOR_HSP = "hsp";		// for the join
 
 	@Override
 	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 		try {
-			if (key.get() == 0) /*&& value.toString().contains("header")*/ /*Some condition satisfying it is header*/
+			if (key.get() == 0) /*Some condition satisfying it is header*/
 				return;
 			else {
 				String line = value.toString();
 				String[] tokens = line.split(COMMA);
 
+				/*check input correctness*/
 				if(tokens.length==8) {
 					LocalDate date = LocalDate.parse(tokens[7]);
 
@@ -37,6 +38,8 @@ public class Ex3HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 	        				Utilities.inputExists(tokens[2]) &&
 	        				Utilities.inputExists(tokens[7])) {
 						
+						Float.parseFloat(tokens[2]);
+
 						//	<ticker, (historical_stock_prices,close,date)>
 						context.write(new Text(tokens[0]), new Text(SEPARATOR_HSP + COMMA + tokens[2] + COMMA + tokens[7]));
 					}

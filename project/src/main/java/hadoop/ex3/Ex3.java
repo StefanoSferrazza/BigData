@@ -18,25 +18,22 @@ import org.apache.hadoop.util.ToolRunner;
 
 /**
  * 
+ * Ex3 BigData Project
  * 
- * 
- * 
- *
  */
 public class Ex3 extends Configured implements Tool{
 
 	public int run(String[] args) throws Exception {
 				
-		
-		// JOB JOIN
-
-		Path temp = new Path("temp");
+		/*PATHS*/
+		Path temp = new Path("temp/ex3Job1Output");
 		Path inputHSP = new Path(args[0]);
 		Path inputHS = new Path(args[1]);
 		Path output = new Path(args[2]);
 
 		Configuration conf = getConf();
 
+		/*JOB JOIN*/
 		Job join = Job.getInstance(conf, "join");
 		join.setJarByClass(Ex3.class);
 
@@ -56,7 +53,7 @@ public class Ex3 extends Configured implements Tool{
 		}
 
 
-		
+		/*JOB3 companies part*/
 		Job job3 = Job.getInstance(conf, "job3");
 		job3.setJarByClass(Ex3.class);
 		
@@ -85,7 +82,7 @@ public class Ex3 extends Configured implements Tool{
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 3) {
-			System.out.println("Usage: XXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+			System.out.println("Usage: Job3 .../historical_stock_prices.csv .../historical_stocks.csv .../RISULTATO_JOB3");
 			System.exit(-1);
 		}
 		int res = ToolRunner.run(new Configuration(), new Ex3(), args);

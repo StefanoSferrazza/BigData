@@ -9,15 +9,10 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 /**
  * 
+ * Mapper for Job3
  * 
- * 
- * 
- * 
- *
  */
 public class Ex3Mapper extends Mapper<Text, Text, Text, Text>{
-
-	private static final String COMMA = ",";
 
 
 	@Override
@@ -26,6 +21,7 @@ public class Ex3Mapper extends Mapper<Text, Text, Text, Text>{
 			String line = value.toString();
 			String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
+			/*check input correctness*/
 			if(tokens.length == 3)
 				context.write(new Text(line), new Text(key));
 		}

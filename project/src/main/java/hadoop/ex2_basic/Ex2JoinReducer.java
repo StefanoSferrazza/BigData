@@ -49,7 +49,7 @@ public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
 					LocalDate date = LocalDate.parse(tokens[3]);
 					int year = date.getYear();
 
-					if(!actionYearFirstClose.containsKey(year)) {		//first actualYear initialization
+					if(!actionYearFirstClose.containsKey(year)) {
 						actionYearFirstDate.put(year,date);
 						actionYearLastDate.put(year,date);
 						actionYearFirstClose.put(year,close);
