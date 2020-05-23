@@ -55,10 +55,11 @@ prepareValues(line)											//organize data for later manipulation
 	counter <- 1
 	
 	key <- ticker
-	EMIT(key, firstDate,lastDate,firstClose,lastClose,minClose,maxClose,volume,counter)
+	value <- firstDate,lastDate,firstClose,lastClose,minClose,maxClose,volume,counter
+	EMIT(key,value)
 	
 	
-reducer(tuple1, tuple2)
+reducer(tuple1, tuple2)										//aggregate on ticker
 	firstDate <- MIN(tuple1.date , tuple2.date)
 	lastDate <- MAX(tuple1.date , tuple2.date)
 	firstClose <- close associated to firstDate
@@ -68,9 +69,10 @@ reducer(tuple1, tuple2)
 	sumVolume <- tuple1.volume + tuple2.volume
 	counter <- tuple1.counter + tuple2.counter
 	
-	EMIT(firstDate,lastDate,firstClose,lastClose,minClose,maxClose,sumVolume,counter)
+	value <- firstDate,lastDate,firstClose,lastClose,minClose,maxClose,sumVolume,counter
+	EMIT()
 
-produceResults(tuple)
+produceResults(tuple)									//calculate results
 	ticker <- tuple.ticker
 	percentageChange <- ((tuple.lastClose - tuple.firstClose) / tuple.firstClose) * 100
 	minPrice <- tuple.minPrice

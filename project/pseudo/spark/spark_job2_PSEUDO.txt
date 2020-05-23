@@ -1,4 +1,4 @@
-HADOOP EX 2 WITH_COMPANIES
+SPARK EX 2
 
 INPUT: 
 	- path to document "historical_stock_prices.csv".
