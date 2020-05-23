@@ -34,7 +34,7 @@ ex1Mapper(key, value)
 		key <- extractTicker(value)
 		
 		if (2008 <= date.year() && date.year() <= 2018):
-			EMIT(Text ticker, Text [close, volume, date])
+			EMIT(ticker, (close, volume, date))
 
 
 ex1Reducer(key, values)
@@ -60,6 +60,6 @@ ex1Reducer(key, values)
 		deltaQuotation = ((lastClose - firstClose) / firstClose) * 100
 		avgVolume = sumVolumes / numValues
 		
-		EMIT(Text "ticker", Text [deltaQuotation,minClose,maxClose,avgVolume])
+		EMIT(ticker, (deltaQuotation,minClose,maxClose,avgVolume))
 		
 		

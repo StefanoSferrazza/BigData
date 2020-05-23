@@ -82,8 +82,7 @@ prepareValuesHSP(line)								//take relevant fields from historical_stock_price
 	EMIT(key, value)
 
 		
-reorganizeVa
-luesAfterJoin(tuple)					//prepare values for later computation
+reorganizeValuesAfterJoin(tuple)					//prepare values for later computation
 	firstDate,lastDate <- tuple.date
 	firstClose,lastClose <- tuple.close
 	company <- tuple.company

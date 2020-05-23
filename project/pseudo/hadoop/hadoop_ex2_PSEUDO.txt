@@ -36,9 +36,6 @@ POST-COND:
 		- avgDailyClose			Long		average daily quotation of sector reported in period 2008-2018
 
 
-SEPARATOR_HSP = "historical_stock_prices";
-SEPARATOR_HS = "historical_stock";
-
 ex2HSPMapper(key, value)
 		skip first row 											//header
 		check_correctness_data(value)							//correct types and date in correct period
@@ -46,7 +43,7 @@ ex2HSPMapper(key, value)
 		key <- extractTicker(value)
 		
 		if (2008 <= date.year() && date.year() <= 2018):
-			EMIT(Text ticker, Text [SEPARATOR_HSP,close, volume, date])
+			EMIT(ticker, (close, volume, date))
 
 
 ex2HSMapper(key, value)
@@ -55,14 +52,14 @@ ex2HSMapper(key, value)
 		sector <- extractRelevantValues(value)					//relevant value is "sector"
 		key <- extractTicker(value)
 		
-		EMIT(Text ticker, Text [SEPARATOR_HS,close_price, volume, date])
+		EMIT(ticker, (close_price, volume, date))
 
 
 ex2JoinReducer(key, values)
 		initialize maps actionYearFirstDate, actionYearLastDate, actionYearFirstClose, actionYearLastClose, 
 				   actionYearSumVolume, actionYearSumDailyClose, actionYearNumRows
-		sector <- values.get(SEPARATOR_HS)
-		close,volume,date <- values.get(SEPARATOR_HSP)
+		sector <- values.get()
+		close,volume,date <- values.get()
 		
 		for each text in values:
 			update actionYearFirstDate, actionYearLastDate, actionYearFirstClose, actionYearLastClose, 
@@ -77,12 +74,12 @@ ex2JoinReducer(key, values)
 			sumDailyClose <- actionYearSumDailyClose.get(year)
 			yearRow <- actionYearNumRows.get(year)
 		
-			EMIT(Text [sector,year], Text [sumVolume,deltaQuotation,sumDailyClose,yearRow])
+			EMIT((sector,year), (sumVolume,deltaQuotation,sumDailyClose,yearRow))
 
 
 ex2Mapper(key, value)
 		sumVolume,deltaQuotation,sumDailyClose,yearRow <- extractRelevantValues(value)
-		EMIT(Text [sector,year], Text [sumVolume,deltaQuotation,sumDailyClose,yearRow])
+		EMIT((sector,year), (sumVolume,deltaQuotation,sumDailyClose,yearRow))
 
 
 ex2Reducer(key, values)
@@ -97,5 +94,5 @@ ex2Reducer(key, values)
 			avgDeltaQuot <- sectorSumDeltaQuotation/counterRows
 			avgDailyClose <- sectorSumDailyClose/sectorYearRows
 		
-			EMIT(Text [sector,year], Text [avgSumVolume,avgDeltaQuot,avgDailyClose])
+			EMIT((sector,year), (avgSumVolume,avgDeltaQuot,avgDailyClose))
 		

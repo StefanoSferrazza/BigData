@@ -29,3 +29,81 @@ POST-COND:
 	- output file needs to be a document, separated by commas, with 5 fields:
 		- SIMILARITIES			String[]	list of companies with same trend in year 2016-2018
 		- TREND					Integer[3]	percentage variation of company in year 2016,2017,2018
+		
+
+ex3HSPMapper(key, value)
+		skip first row 											//header
+		check_correctness_data(value)							//correct types and date in correct period
+		close,volume,date <- extractRelevantValues(value)		//relevant values are "close","volume","date"
+		key <- extractTicker(value)
+		
+		if (2008 <= date.year() && date.year() <= 2018):
+			EMIT(ticker, (close, volume, date))
+
+
+
+ex3HSMapper(key, value)
+		skip first row 											//header
+		check_correctness_data(value)							//correct types and date in correct period
+		company <- extractRelevantValues(value)					//relevant value is "company"
+		key <- extractTicker(value)
+		
+		EMIT(ticker, company)
+		
+		
+		
+ex3JoinReducer(key,values)
+	SETUP phase
+		initialize maps companyYearStartQuotation, companyYearEndQuotation, companyAnnualVariations
+	
+	REDUCE phase
+		joinValuesOn(key)
+		initialize maps yearFirstDate,yearLastDate,yearFirstClose,yearLastClose
+		for each value in values
+			year <- value.year
+			firstDate <- MIN(value.date,yearFirstDate.get(year))
+			lastDate <- MAX(value.date,yearLastDate.get(year))
+			firstClose <- close associated to firstDate
+			lastClose <- close associated to lastDate
+			update maps pair with key year
+			
+		for each year in yearFirstDate
+			firstClose <- yearFirstClose.get(year)
+			lastClose <- yearLastClose.get(year)
+			sumFirstCloses <- companyYearStartQuotation.get(company,year) + firstClose
+			sumLastCloses <- companyYearEndQuotation.get(company,year) + lastClose
+			update maps companyYearStartQuotation,companyYearEndQuotation with key company,year
+
+			
+	CLEANUP phase
+		for each company,year in companyYearStartQuotation
+			sumFirstCloses <- companyYearStartQuotation.get(companyYear)
+			sumLastCloses <- companyYearStartQuotation.get(companyYear)
+			companyAnnualVariation <- ((sumLastCloses - sumFirstCloses) /sumFirstCloses)*100
+			update companyAnnualVariations with key company and value companyAnnualVariation for respective year
+			
+			EMIT(company,(companyAnnualVariations.get(company)))
+
+Ex3Mapper(key,value)
+	checkCorrectValues(value)
+	EMIT(key,value)
+	
+Ex3Reducer(key,values)
+	SETUP phase
+		initialize maps companiesNumbers,companiesQuotations
+		EMIT(header)
+	
+	REDUCE phase
+		for each value in values
+			companies <- append value.company
+		counterCompanies <- companies.length
+		if(counterCompanies>1)
+			update maps companiesNumbers,companiesQuotations
+			
+	CLEANUP phase
+		for each comps in companiesNumbers
+			numberOfCompanies <- companiesNumbers.get(comps)
+			trend <- companiesQuotations.get(comps)
+			EMIT(numberOfCompanies, (comps,trend))
+
+
