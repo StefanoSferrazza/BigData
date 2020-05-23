@@ -28,6 +28,9 @@ public class Ex2_spark {
 
 	private static final String COMMA = ",";
 	
+	/**
+	 * le funzioni utilizzate sono le stesse che in Ex2_soark_singleRow, dove sono commentate. In questa classe viene divisa l'elaborazione in più step.s
+	 */
 	public static void main(String[] args) throws IOException {
 		if (args.length!=3) {
 			System.err.println("Usage: ./bin/spark-submit --class spark.job2.Job2_spark jar_path input_path/historical_stocks input_path/historical_stock_prices output_path");

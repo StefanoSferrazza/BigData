@@ -43,27 +43,33 @@ public class Ex1_spark {
 		JavaRDD<String> lines = session.read().textFile(inputPath).javaRDD();
 
 
-		Function<String,Boolean> checkLine = s ->	{
-														try {
-															String[] tokens = s.split(COMMA);
-															if(tokens.length==8 &&
-																	Utilities.inputExists(tokens[0]) &&
-																	Utilities.inputExists(tokens[2]) &&
-																	Utilities.inputExists(tokens[6]) &&
-																	Utilities.inputExists(tokens[7])) {
-																LocalDate date = LocalDate.parse(tokens[7]);
-																if(date.getYear()>=2008 && date.getYear()<=2018 ) {
-																	return true;
-																}
-															}
-															return false;
-														}
-														catch(Exception e) {
-															return false;
-														}
-													};
+		/**
+		 * elimina righe che contengono dati sporchi
+		 */
+		Function<String,Boolean> checkLine = 
+				s ->	{
+							try {
+								String[] tokens = s.split(COMMA);
+								if(tokens.length==8 &&
+									Utilities.inputExists(tokens[0]) &&
+									Utilities.inputExists(tokens[2]) &&
+									Utilities.inputExists(tokens[6]) &&
+									Utilities.inputExists(tokens[7])) {
+										LocalDate date = LocalDate.parse(tokens[7]);
+										if(date.getYear()>=2008 && date.getYear()<=2018 ) {
+											return true;
+										}
+									}
+									return false;
+							}
+							catch(Exception e) {
+								return false;
+							}
+		};
 												
-		
+		/**
+		 * prepara i valori presi in input per successive elaborazioni
+		 */
 		//<ticker, (firstDate,lastDate,firstClose,lastClose,minClose,maxClose,volume,counter)>																						
 		PairFunction<String, String, Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>> prepareValues = 
 				s -> {
@@ -75,12 +81,15 @@ public class Ex1_spark {
 					Long volume = Long.parseLong(tokens[6]);
 					Integer counter = 1;
 					return new Tuple2<>(ticker, new Tuple8<>(date,date,close,close,close,close,volume,counter));
-				};
+		};
 		
 
 		JavaPairRDD<String,Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>> tuplesRedundant = lines.filter(checkLine)
 																											.mapToPair(prepareValues);
 		
+		/**
+		 * aggrega i valori per ticker
+		 */
 		// Reduce creation
 		Function2<	Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>, 
 					Tuple8<LocalDate, LocalDate, Float, Float, Float, Float, Long, Integer>, 
@@ -109,13 +118,14 @@ public class Ex1_spark {
 						maxClose = t2._6();
 					}
 					return new Tuple8<>(firstDate,lastDate,firstClose,lastClose,minClose,maxClose,sumVolume,counter);
-				};
+		};
 		
 		
 		JavaPairRDD<String,Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>> resultsReduntant = tuplesRedundant.reduceByKey(reducer);
 		
-		//PRODUCE RESULTS
-		
+		/**
+		 * calcola i risultati
+		 */
 		Function<Tuple2<String, Tuple8<LocalDate,LocalDate,Float,Float,Float,Float,Long,Integer>>, Result_Ex1> produceResults =
 				t -> {
 					
@@ -137,7 +147,7 @@ public class Ex1_spark {
 
 					return new Result_Ex1(ticker, percentageChange, minPrice, maxPrice, avgVolume);
 					
-				};
+		};
 								
 		
 		JavaRDD<Result_Ex1> results = resultsReduntant.map(produceResults).sortBy(f -> f, true, 1);

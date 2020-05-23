@@ -48,7 +48,9 @@ public class Ex3_spark {
 
 		JavaRDD<String> linesHSP = session.read().textFile(inputPathHSP).javaRDD();
 
-
+		/**
+		 * filtra le righe che contengono dati sporchi
+		 */
 		Function<String,Boolean> checkInputHS = 
 				line ->	{
 					try {
@@ -65,6 +67,9 @@ public class Ex3_spark {
 					}
 		};
 
+		/**
+		 * filtra le righe che contengono dati sporchi
+		 */
 		Function<String,Boolean> checkInputHSP = 
 				line ->	{
 					try {
@@ -86,6 +91,9 @@ public class Ex3_spark {
 					}
 		};
 
+		/**
+		 * prepara i valori di input per le successive elaborazioni
+		 */
 		PairFunction<String, String, String> prepareValuesHS = 
 				line -> {
 					String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -96,6 +104,9 @@ public class Ex3_spark {
 					return new Tuple2<>(ticker,company);
 		};
 
+		/**
+		 * prepara i valori di input per le successive elaborazioni
+		 */
 		PairFunction<String,String,Tuple2<Float,LocalDate>>prepareValuesHSP =
 				line -> {
 					String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -107,8 +118,9 @@ public class Ex3_spark {
 					return new Tuple2<>(ticker , new Tuple2<>(close,date));
 		};
 		
-		
-		
+		/**
+		 * prepara i valori di input per le successive elaborazioni a seguito del join
+		 */
 		PairFunction<	Tuple2<String, Tuple2<Tuple2<Float, LocalDate>, String>>,					//<ticker, [(close,date),(company)]>
 		String, Tuple5<LocalDate,LocalDate,Float,Float,String>> 	reorganizeValuesAfterJoin = 			//<(ticker,year),(firstDate,lastDate,firstClose,lastClose,company)>
 		tuple -> {
@@ -125,6 +137,9 @@ public class Ex3_spark {
 			return new Tuple2<>(tickerYearKey ,new Tuple5<>(firstDate,lastDate,firstClose,lastClose,company));
 		};
 		
+		/**
+		 * aggrega per ticker anno
+		 */
 		//(firstDate,lastDate,firstClose,lastClose,company)
 		Function2<	Tuple5<LocalDate,LocalDate,Float,Float,String>,
 					Tuple5<LocalDate,LocalDate,Float,Float,String>,
@@ -150,7 +165,9 @@ public class Ex3_spark {
 		};
 		
 		
-		
+		/**
+		 * cambia chiave a compagnia anno
+		 */
 		PairFunction<	Tuple2<String,Tuple5<LocalDate,LocalDate,Float,Float,String>>,
 						String, Tuple2<Float,Float>> map_fromTickerToCompany = 
 		tuple -> {
@@ -168,7 +185,9 @@ public class Ex3_spark {
 		};
 		
 		
-		
+		/**
+		 * aggrega per compagnia
+		 */
 		//firstClose,lastClose
 		Function2<	Tuple2<Float,Float>,
 					Tuple2<Float,Float>,
@@ -181,7 +200,9 @@ public class Ex3_spark {
 						return new Tuple2<>(sumFirstCloses,sumLastCloses);
 		};
 		
-		
+		/**
+		 * aggrega di nuovo per compagnia e cambia la chiave a compagnia
+		 */
 		PairFunction<	Tuple2<String, Tuple2<Float,Float>>,
 		String, Tuple3<Integer,Integer,Integer>> map_calculateVarPercCompanyYear_changeKeyToCompany =
 			tuple -> {
@@ -210,7 +231,9 @@ public class Ex3_spark {
 
 		};
 
-
+		/**
+		 * unisci le variazioni percentuali dei vari anni delle stesse compagnie
+		 */
 		Function2<	Tuple3<Integer,Integer,Integer>,
 					Tuple3<Integer,Integer,Integer>,
 					Tuple3<Integer,Integer,Integer> > reduce_unifyTrends =
@@ -233,6 +256,9 @@ public class Ex3_spark {
 					return new Tuple3<>(varYear2016,varYear2017,varYear2018);
 		};
 
+		/**
+		 * controlla che le compagnie abbiano le rispettive variazioni percentuali per tutto il trienno 2016-2018
+		 */
 		Function<Tuple2<String,Tuple3<Integer,Integer,Integer>>,Boolean> checkAllYearPresent = 
 				tuple -> {
 					if(		tuple._2._1()==null || 
@@ -244,6 +270,9 @@ public class Ex3_spark {
 						return true;
 		};
 		
+		/**
+		 * inverti la chiave per trend
+		 */
 		PairFunction<	Tuple2<String,Tuple3<Integer,Integer,Integer>>,
 		Tuple3<Integer,Integer,Integer>, String> invertKey_fromCompany_toVarYear =
 			tuple -> {
@@ -259,6 +288,9 @@ public class Ex3_spark {
 				return new Tuple2<>(new Tuple3<>(varYear2016,varYear2017,varYear2018), company);
 		};
 		
+		/**
+		 * aggrega per trend unendo le compagnie con lo stesso trend
+		 */
 		Function2<	String,
 					String,
 					String	> reduce_companySameTrend =
@@ -266,7 +298,9 @@ public class Ex3_spark {
 						return tuple1 + COMMA + tuple2;
 		};
 		
-		
+		/**
+		 * cambia chiave per numero di compagnie con stesso trend, serve soltanto per dare un ordinamento
+		 */
 		PairFunction<	Tuple2<Tuple3<Integer,Integer,Integer>, String>,
 						Integer,
 						Tuple2<Tuple3<Integer,Integer,Integer>, String>> mapByNumberSimilarCompaniesTrend =

@@ -43,6 +43,9 @@ public class Ex2_spark_singleRow {
 					.appName("Job2")
 					.getOrCreate();
 
+			/**
+			 * filtra righe con dati sporchi
+			 */
 			Function<String,Boolean> checkInputHS = 
 					line ->	{
 								try {
@@ -58,8 +61,11 @@ public class Ex2_spark_singleRow {
 								catch(Exception e) {
 									return false;
 								}
-							};
+			};
 
+			/**
+			 * filtra righe con dati sporchi
+			 */				
 			Function<String,Boolean> checkInputHSP = 
 					line ->	{
 								try {
@@ -81,8 +87,11 @@ public class Ex2_spark_singleRow {
 								catch(Exception e) {
 									return false;
 								}
-							};
+			};
 
+			/**
+			 * prendi valori rilevanti per il job
+			 */
 			PairFunction<String, String, Tuple2<String,String>> prepareValuesHS = 
 					line -> {
 						String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -92,8 +101,11 @@ public class Ex2_spark_singleRow {
 						String sector = tokens[3];
 						
 						return new Tuple2<>(ticker,new Tuple2<>(company,sector));
-					};
+			};
 
+			/**
+			 * prendi valori rilevanti per il job
+			 */
 			PairFunction<String,String,Tuple3<Float,Long,LocalDate>>prepareValuesHSP =
 					line -> {
 						String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -104,10 +116,11 @@ public class Ex2_spark_singleRow {
 						LocalDate date = LocalDate.parse(tokens[7]);
 						
 						return new Tuple2<>(ticker , new Tuple3<>(close,volume,date));
-					};
+			};
 
-
-			
+			/**
+			 * prepara i valori duplicando il necessario, affinchè possano essere aggregati nei prossimi step
+			 */
 			PairFunction<	Tuple2<String, Tuple2<Tuple3<Float, Long, LocalDate>, Tuple2<String, String>>>,					//<ticker, [(close,volume,date),(company,sector)]>
 			String, Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>> 	reorganizeValuesAfterJoin = 			//<(ticker,year),(volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector)>
 			tuple -> {
@@ -129,6 +142,9 @@ public class Ex2_spark_singleRow {
 			};
 			
 			
+			/**
+			 * aggrega i valori per ticker
+			 */
 			//volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector
 			Function2<	Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>,
 						Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>,
@@ -154,8 +170,11 @@ public class Ex2_spark_singleRow {
 							}
 							
 							return new Tuple9<>(sumVolume,firstDate,lastDate,firstClose,lastClose,sumClose,counterDays,company,sector);
-						};
-						
+			};
+			
+			/**
+			 * cambia la chiave a compagnia
+			 */
 			//change key KEY: (company,year) VALUE: (sumVolume,firstClose,lastClose,sumClose,counterDays,sector)>
 			PairFunction<	Tuple2<String,Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>>,
 							String, Tuple6<Long,Float,Float,Float,Integer,String>> map_fromTickerToCompany = 
@@ -174,9 +193,12 @@ public class Ex2_spark_singleRow {
 								
 								String companyYearKey = company + COMMA + year;
 								return new Tuple2<>(companyYearKey, new Tuple6<>(sumVolume,firstClose,lastClose,sumClose,counterDays,sector));
-							};
+			};
 							
 
+			/**
+			 * aggrega per compagnia		
+			 */
 			//(sumVolume,firstClose,lastClose,sumCloses,counterDays,sector)
 			Function2<	Tuple6<Long,Float,Float,Float,Integer,String>,
 						Tuple6<Long,Float,Float,Float,Integer,String>,
@@ -190,10 +212,12 @@ public class Ex2_spark_singleRow {
 							String sector = tuple1._6();
 							
 							return new Tuple6<>(sumVolumeCompany,sumFirstCloses,sumLastCloses,sumCloses,sumCountersDays,sector);
-						};
+			};
 			
 						
-
+			/**
+			 * calcola aggregati per comagnia e cambia chiave a settore
+			 */
 			//KEY: (company,year) VALUE: (sumVolume,sumFirstCloses,sumLastCloses,sumCloses,sumCountersDays,sector)>
 			//change key KEY: (sector,year)	VALUE:	(sumVolume,varYear,dailyQuot,counterCompanies)
 			PairFunction<	Tuple2<String,Tuple6<Long,Float,Float,Float,Integer,String>>,
@@ -220,9 +244,11 @@ public class Ex2_spark_singleRow {
 								String sectorYearKey = sector + COMMA + year;
 								
 								return new Tuple2<>(sectorYearKey, new Tuple4<>(sumVolume,varYear,dailyQuot,counterCompanies));
-							};
+			};
 							
-
+			/**
+			 * aggrega per chiave
+			 */
 			//(sumVolume,varYear,dailyQuot,counterCompanies)
 			Function2<	Tuple4<Long,Float,Float,Integer>,
 						Tuple4<Long,Float,Float,Integer>,
@@ -234,8 +260,11 @@ public class Ex2_spark_singleRow {
 							Integer counterCompanies = tuple1._4() + tuple2._4();
 							
 							return new Tuple4<>(sumVolumes,sumVars,sumQuots,counterCompanies);
-						};
-						
+			};
+			
+			/**
+			 * calcola risultati			
+			 */
 			//MAP TO COMPUTE RESULT
 			Function<Tuple2<String, Tuple4<Long,Float,Float,Integer>>, String> map_avgSector =
 					tuple -> {
