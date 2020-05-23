@@ -2,11 +2,7 @@ package hadoop.ex1;
 
 import org.apache.hadoop.mapreduce.Reducer;
 
-
-import utilities.Utilities;
-
 import java.io.IOException;
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,33 +15,37 @@ import org.apache.hadoop.io.Text;
 
 /**
  * 
+ * First Reducer for Ex1
  * 
- * 
- * 
- *
  */
 public class Ex1Reducer extends Reducer<Text, Text, Text, Text>{
 
 	private static final String COMMA = ",";
-	private List<Result_Ex1> results;
+	
+	private List<Result_Ex1> results;		//list with tmp results before sorting
 
+	
+	/**
+	 * Set first record as the header with the names of the columns 
+	 */
 	@Override
 	protected void setup(Context context) throws IOException, InterruptedException{
 		context.write(new Text("TICKER" + COMMA), new Text("VARIAZIONE_QUOTAZIONE_%" + COMMA + "PREZZO_MIN" + COMMA + "PREZZO_MAX" + COMMA + "VOLUME_MEDIO"));
 		results = new LinkedList<Result_Ex1>();
 	}
 	
+
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
-		//declaration and dummy initialization, will be overwritten when sees first value
-		float firstClose = 0;					//to calculate final percentageChange
-		float lastClose = 0;					//to calculate final percentageChange
-		LocalDate firstDate = LocalDate.now();			//to take correct initialCloseValue (first close in time)
-		LocalDate lastDate = LocalDate.now();			//to take correct finalCloseValue (last close in time)
+		/*declaration and dummy initialization, will be overwritten when sees first value*/
+		float firstClose = 0;					//to calculate final deltaQuotation
+		float lastClose = 0;					//to calculate final deltaQuotation
+		LocalDate firstDate = LocalDate.now();	//to take correct firstClose (first close in time)
+		LocalDate lastDate = LocalDate.now();	//to take correct lasttClose (last close in time)
 		float minClose = 999999999;		
 		float maxClose = 0;				
-		int counterTuples = 0;								//to calculate avg of volumes
-		long sumVolumes = 0;								//to calculate avg of volumes
-		boolean valuesInitialized = false;					//to initialize on first iteration
+		int counterTuples = 0;					//to calculate avg of volumes
+		long sumVolumes = 0;					//to calculate avg of volumes
+		boolean valuesInitialized = false;		//to initialize on first iteration
  
 		//<ticker,(date,close,volume)>
 		for(Text value : values) {
@@ -84,21 +84,28 @@ public class Ex1Reducer extends Reducer<Text, Text, Text, Text>{
 			sumVolumes += volume;
 		}
 
-		int percentageChange = Math.round(((lastClose - firstClose) / firstClose)*100);
+		/*calculate deltaQuotation based on its definition and round it*/
+		int deltaQuotation = Math.round(((lastClose - firstClose) / firstClose)*100);
 
+		/*calculate avgVolume based on its definition*/
 		long avgVolume = sumVolumes/counterTuples;
 
 		String ticker = key.toString();
 
-		results.add(new Result_Ex1(ticker,percentageChange,minClose,maxClose,avgVolume));
+		/*build tmp result before sorting*/
+		results.add(new Result_Ex1(ticker,deltaQuotation,minClose,maxClose,avgVolume));
 	}
 
+
+
+	/**
+	 * Use the cleanup method to sort the tmp results and produce output 
+	 */
 	@Override
 	protected void cleanup(Context context) throws IOException, InterruptedException{
 		Collections.sort(results);
 		for(Result_Ex1 r : results) {
-			context.write(	new Text(	r.getTicker()), 
-					new Text(r.toString()));
+			context.write(new Text(r.getTicker()),new Text(r.toString()));
 		}
 	}
 }

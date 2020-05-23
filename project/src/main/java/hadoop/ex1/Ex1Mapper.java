@@ -11,14 +11,13 @@ import utilities.Utilities;
 
 /**
  * 
+ * First Mapper for Ex1
  * 
- * 
- * 
- *
  */
 public class Ex1Mapper extends Mapper<LongWritable, Text, Text, Text> {
 
 	private static final String COMMA = ",";
+
 
 	public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
 
@@ -27,7 +26,8 @@ public class Ex1Mapper extends Mapper<LongWritable, Text, Text, Text> {
 				return;
 
 			String[] tokens = value.toString().split(COMMA);
-
+			
+			/*check input correctness*/
 			if(tokens.length==8 &&
 					Utilities.inputExists(tokens[0]) &&		//ticker
 					Utilities.inputExists(tokens[2]) &&		//close
@@ -35,7 +35,8 @@ public class Ex1Mapper extends Mapper<LongWritable, Text, Text, Text> {
 					Utilities.inputExists(tokens[7])) {		//date
 
 				LocalDate date = LocalDate.parse(tokens[7]);
-
+				
+				/*filter only required records*/
 				if(date.getYear()>=2008 && date.getYear()<=2018) {
 					Text ticker = new Text(tokens[0]);
 					String close = tokens[2];
