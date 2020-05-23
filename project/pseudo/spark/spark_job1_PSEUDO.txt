@@ -1,0 +1,102 @@
+SPARK EX 1
+
+INPUT: 
+	- path to document "historical_stock_prices.csv".
+	- path for output result.
+
+PRE-COND:
+	- path to historical_stock_prices.csv needs to be valid.
+	- historical_stock_prices.csv needs to be a document, separated by commas, with 8 fields:
+		- TICKER		String		unique share symbol
+		- OPEN			Float		open price
+		- CLOSE 		Float		close price
+		- ADJ_CLOSE 	Float		adjusted close price
+		- LOW 			Float		min price
+		- HIGH 			Float		max price
+		- VOLUME 		Long		number of transactions
+		- DATE			Date 		date in format yyyy-mm-dd
+	- output path needs to be valid.
+
+POST-COND:
+	- output file needs to be a document, separated by commas, with 5 fields:
+		- TICKER				String					
+		- DELTA_QUOTATION_%		String  (Integer with %)	percentage change rounded of ticker value in period 2008-2018
+		- MIN_CLOSE				Float   min "close" value reported in period 2008-2018
+		- MAX_CLOSE				Float   max "close" value reported in period 2008-2018
+		- AVG_VOLUME			Long    average "volume" in period 2008-2018
+	- document rows need to be sorted by descending "DELTA_QUOTATION_%" 
+	
+	
+checkline(line)												//filter dirty rows
+	check_correctness_data(line)							//correct types 
+	if (2008 <= date.year() && date.year() <= 2018):
+		return true
+	return false
+	
+	
+prepareValues(line)											//organize data for later manipulation
+	firstDate <- line.date
+	lastDate <- line.date
+	firstClose <- line.close
+	lastClose <- line.close
+	minClose <- line.close
+	maxClose <- line.close
+	volume <- line.volume
+	counter <- 1
+	
+	key <- ticker
+	EMIT(key, firstDate,lastDate,firstClose,lastClose,minClose,maxClose,volume,counter)
+	
+	
+reducer(tuple1, tuple2)
+	firstDate <- MIN(tuple1.date , tuple2.date)
+	lastDate <- MAX(tuple1.date , tuple2.date)
+	firstClose <- close associated to firstDate
+	lastClose <- close associated to lastDate
+	minClose <- MIN(tuple1.close , tupl2.close)
+	maxClose <- MAX(tuple1.close , tupl2.close)
+	sumVolume <- tuple1.volume + tuple2.volume
+	counter <- tuple1.counter + tuple2.counter
+	
+	EMIT(firstDate,lastDate,firstClose,lastClose,minClose,maxClose,sumVolume,counter)
+
+produceResults(tuple)
+	ticker <- tuple.ticker
+	percentageChange <- ((tuple.lastClose - tuple.firstClose) / tuple.firstClose) * 100
+	minPrice <- tuple.minPrice
+	maxPrice <- tuple.maxPrice
+	avgVolume <- tuple.volume / tuple.counter
+
+	result <- ticker, percentageChange, minPrice, maxPrice, avgVolume
+	EMIT(result)
+	
+main
+	inputData.checkline(line)
+				.prepareValues(line)
+				.reducer(tuple1, tuple2)
+				.produceResults(tuple)
+				.descendentSort(result.percentageChange)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	

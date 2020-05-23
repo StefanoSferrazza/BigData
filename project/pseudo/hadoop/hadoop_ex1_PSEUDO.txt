@@ -29,7 +29,7 @@ POST-COND:
 
 ex1Mapper(key, value)
 		skip first row 											//header
-		check_correctness_data(value)							//correct types and date in correct period
+		check_correctness_data(value)							//correct types 
 		close,volume,date <- extractRelevantValues(value)		//relevant values are "close","volume","date"
 		key <- extractTicker(value)
 		

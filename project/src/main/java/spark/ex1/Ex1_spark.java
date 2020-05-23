@@ -92,7 +92,7 @@ public class Ex1_spark {
 					Float lastClose = t1._4();
 					Float minClose = t1._5();
 					Float maxClose = t1._6();
-					Long volume = t1._7() + t2._7();
+					Long sumVolume = t1._7() + t2._7();
 					Integer counter = t1._8() + t2._8();
 					if(t2._1().isBefore(t1._1())) {
 						firstDate = t2._1();
@@ -108,7 +108,7 @@ public class Ex1_spark {
 					if(t2._6()>t1._6()) {
 						maxClose = t2._6();
 					}
-					return new Tuple8<>(firstDate,lastDate,firstClose,lastClose,minClose,maxClose,volume,counter);
+					return new Tuple8<>(firstDate,lastDate,firstClose,lastClose,minClose,maxClose,sumVolume,counter);
 				};
 		
 		
