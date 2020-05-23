@@ -17,9 +17,9 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-import hadoop.ex2.Ex2;
-import hadoop.ex2.Ex2HSPMapper;
-import hadoop.ex2.Ex2JoinReducer;
+import hadoop.ex2_basic.Ex2;
+import hadoop.ex2_basic.Ex2HSPMapper;
+import hadoop.ex2_basic.Ex2JoinReducer;
 import hadoop.ex2_comps.Ex2CompanyMapper_Companies;
 import hadoop.ex2_comps.Ex2CompanyReducer_Companies;
 import hadoop.ex2_comps.Ex2HSMapper_Companies;

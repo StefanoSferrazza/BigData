@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_basic;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -17,10 +17,8 @@ import org.apache.hadoop.util.ToolRunner;
 
 /**
  * 
+ * Ex2 BigData Project
  * 
- * 
- * 
- *
  */
 public class Ex2 extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
@@ -33,7 +31,7 @@ public class Ex2 extends Configured implements Tool{
 
 		Configuration conf = getConf();
 
-		/*JOIN*/
+		/*JOB JOIN*/
 		Job join = Job.getInstance(conf, "join");
 		join.setJarByClass(Ex2.class);
 

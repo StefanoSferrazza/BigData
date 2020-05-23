@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_basic;
 
 import java.io.IOException;
 
@@ -8,10 +8,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 /**
  * 
+ * Mapper for Job2
  * 
- * 
- * 
- *
  */
 public class Ex2Mapper extends Mapper<Text,Text,Text,Text>{
 
@@ -22,7 +20,9 @@ public class Ex2Mapper extends Mapper<Text,Text,Text,Text>{
 			String line = value.toString();
 			String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
+			/*check input correctness*/
 			if(tokens.length==4)
+				//	<(sector,year), (sumVolume,deltaQuotation,sumDailyClose,yearRow)>
 				context.write(new Text(key.toString()), new Text(line));
 		}
 		catch(Exception e) {

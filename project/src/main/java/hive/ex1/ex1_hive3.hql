@@ -14,7 +14,7 @@ GROUP BY ticker;
 
 
 
----------- VERSION WITH BETTER OUTPUT FORMAT ----------
+---------- VERSION LIKE 1 BUT WITH BETTER OUTPUT FORMAT ----------
 DROP TABLE if exists ex1_hive;
 
 CREATE TABLE ex1_hive

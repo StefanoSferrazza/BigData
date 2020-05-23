@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_basic;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -10,9 +10,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 /**
  * 
+ * Reducer for Job Join
  * 
- * 
- *
  */
 public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
 
@@ -24,7 +23,7 @@ public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
 	@Override
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 
-		/*maps initialization. each map is used to store a specific value respecting into a year (alternative to create an object, made to avoid too structures)*/
+		/*maps initialization. each map is used to store a specific value with respect to a year (alternative to create an object, made to avoid too structures)*/
 		HashMap<Integer, LocalDate> actionYearFirstDate = new HashMap<Integer, LocalDate>();
 		HashMap<Integer, LocalDate> actionYearLastDate = new HashMap<Integer, LocalDate>();
 		HashMap<Integer, Float> actionYearFirstClose = new HashMap<Integer, Float>();
@@ -87,18 +86,19 @@ public class Ex2JoinReducer extends Reducer<Text, Text, Text, Text>{
 				}
 		}
 
-		if(!sector.equals("")) {	//corrisponderebbe a dati non contenenti "sector" in "historical_stocks"
+		if(!sector.equals("")) {	//required to remove cases without sector AFTER join
 			for(Integer year : actionYearFirstClose.keySet()) {
 				float lastClose = actionYearLastClose.get(year);
 				float firstClose = actionYearFirstClose.get(year);
-				float yearPercentageVariation = ((lastClose-firstClose)/firstClose)*100;
+				/*calculate deltaQuotation based on its definition and round it*/
+				float deltaQuotation = ((lastClose-firstClose)/firstClose)*100;
 
 				long sumVolume = actionYearSumVolume.get(year);
 				float sumDailyClose = actionYearSumDailyClose.get(year);
 				long yearRow = actionYearNumRows.get(year);
 
-				//	<(sector,year), (sumVolume,yearPercentageVariation,sumDailyClose,yearRow)>
-				context.write(new Text(sector + COMMA + year), new Text(sumVolume + COMMA + yearPercentageVariation + COMMA + sumDailyClose + COMMA + yearRow));
+				//	<(sector,year), (sumVolume,deltaQuotation,sumDailyClose,yearRow)>
+				context.write(new Text(sector + COMMA + year), new Text(sumVolume + COMMA + deltaQuotation + COMMA + sumDailyClose + COMMA + yearRow));
 			}
 		}
 	}

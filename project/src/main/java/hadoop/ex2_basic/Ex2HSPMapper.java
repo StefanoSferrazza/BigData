@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_basic;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -12,15 +12,13 @@ import utilities.Utilities;
 
 /**
  * 
+ * Mapper for Historical_Stock_Prices
  * 
- * 
- * 
- *
  */
 public class Ex2HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";
-	private static final String SEPARATOR_HSP = "historical_stock_prices";
+	private static final String SEPARATOR_HSP = "historical_stock_prices";		// for the join
 
 	@Override
 	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -32,6 +30,7 @@ public class Ex2HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 				String line = value.toString();
 				String[] tokens = line.split(COMMA);
 
+				/*check input correctness*/
 				if(tokens.length==8) {
 					LocalDate date = LocalDate.parse(tokens[7]);
 
@@ -41,7 +40,6 @@ public class Ex2HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 							Utilities.inputExists(tokens[6]) &&
 							Utilities.inputExists(tokens[7]) ) {
 
-						/*parsing solo per lanciare eccezione nel caso in cui i dati fossero sporchi, così da skippare la riga*/
 						Float.parseFloat(tokens[2]);
 						Long.parseLong(tokens[6]);
 

@@ -1,4 +1,4 @@
-package hadoop.ex2;
+package hadoop.ex2_basic;
 
 import java.io.IOException;
 
@@ -11,14 +11,14 @@ import utilities.Utilities;
 
 /**
  * 
+ * Mapper for Historical_Stocks
  * 
- * 
- *
  */
 public class Ex2HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";
-	private static final String SEPARATOR_HS = "historical_stock";
+	private static final String SEPARATOR_HS = "historical_stock";		// for the join
+
 
 	@Override
 	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -30,6 +30,7 @@ public class Ex2HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
+				/*check input correctness*/
 				if(tokens.length==5	&&
 						Utilities.inputExists(tokens[0]) &&
 						Utilities.inputExists(tokens[3]) ) {

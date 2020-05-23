@@ -15,7 +15,7 @@ import org.apache.hadoop.io.Text;
 
 /**
  * 
- * First Reducer for Ex1
+ * Reducer for Job1
  * 
  */
 public class Ex1Reducer extends Reducer<Text, Text, Text, Text>{
@@ -34,8 +34,9 @@ public class Ex1Reducer extends Reducer<Text, Text, Text, Text>{
 		results = new LinkedList<Result_Ex1>();
 	}
 	
-
-	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+	@Override
+	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
+		
 		/*declaration and dummy initialization, will be overwritten when sees first value*/
 		float firstClose = 0;					//to calculate final deltaQuotation
 		float lastClose = 0;					//to calculate final deltaQuotation
