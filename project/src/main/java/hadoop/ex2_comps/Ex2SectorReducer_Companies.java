@@ -34,11 +34,11 @@ public class Ex2SectorReducer_Companies extends Reducer<Text,Text,Text,Text>{
 			for(Text value : values) {
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-				if(tokens.length==3) {  //4) {
+				if(tokens.length==4) {
 					sectorSumVolume += Long.parseLong(tokens[0]);
 					sectorSumDeltaQuotation += Float.parseFloat(tokens[1]);
 					sectorSumDailyClose += Float.parseFloat(tokens[2]);
-					counterCompanies ++;
+					counterCompanies +=Integer.parseInt(tokens[3]);
 				}
 			}
 

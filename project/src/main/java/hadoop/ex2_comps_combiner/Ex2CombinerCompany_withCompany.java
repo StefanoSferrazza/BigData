@@ -18,22 +18,20 @@ public class Ex2CombinerCompany_withCompany extends Reducer<Text,Text,Text,Text>
 			float sumFirstCloses = 0;
 			float sumDailyCloses = 0;
 			long yearRowsEachTicker = 0;
-			String sector = "";
 			for(Text value : values) {
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
-				if(tokens.length==6) {
+				if(tokens.length==5) {
 					sumYearVolumeCompany += Long.parseLong(tokens[0]);
 					sumLastCloses += Float.parseFloat(tokens[1]);
 					sumFirstCloses += Float.parseFloat(tokens[2]);
 					sumDailyCloses += Float.parseFloat(tokens[3]);
 					yearRowsEachTicker += Long.parseLong(tokens[4]);
-					sector=tokens[5];
 				}
 			}
 			
 			
-			context.write(key, new Text(sumYearVolumeCompany + COMMA + sumLastCloses + COMMA + sumFirstCloses + COMMA + sumDailyCloses + COMMA + yearRowsEachTicker + COMMA + sector));
+			context.write(key, new Text(sumYearVolumeCompany + COMMA + sumLastCloses + COMMA + sumFirstCloses + COMMA + sumDailyCloses + COMMA + yearRowsEachTicker));
 
 		}
 		catch(Exception e) {
