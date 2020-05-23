@@ -1,0 +1,168 @@
+HADOOP EX 2 WITH_COMPANIES
+
+INPUT: 
+	- path to document "historical_stock_prices.csv".
+	- path to document "historical_stocks.csv".
+	- path for output result.
+
+PRE-COND:
+	- path to historical_stock_prices.csv needs to be valid.
+	- path to historical_stocks.csv needs to be valid.
+	- historical_stock_prices.csv needs to be a document, separated by commas, with 8 fields:
+		- TICKER		String		unique share symbol
+		- OPEN			Float		open price
+		- CLOSE 		Float		close price
+		- ADJ_CLOSE 	Float		adjusted close price
+		- LOW 			Float		min price
+		- HIGH 			Float		max price
+		- VOLUME 		Long		number of transactions
+		- DATE			Date 		date in format yyyy-mm-dd
+	- historical_stocks.csv needs to be a document, separated by commas, with 5 fields:
+		- TICKER		String		unique share symbol
+		- EXCHANGE		String		NYSE or NASDAQ
+		- NAME 			String		company name
+		- SECTOR 		String		sector name
+		- INDUSTRY 		String		industry name
+	- output path needs to be valid.
+
+POST-COND:
+	- output file needs to be a document, separated by commas, with 5 fields:
+		- SECTOR		String
+		- YEAR			String				
+		- avgVolume				Long		average annual volume of sector	
+		- DELTA_QUOTATION_%		String  	(Integer with %)	percentage change rounded of volume
+		- avgDailyClose			Long		average daily quotation of sector
+		
+main
+	valuesHSP.join(valuesHS)
+				.reorganizeValuesAfterJoin
+				.reduce_sumVolumesTicker_findFirstLastClose
+				.map_fromTickerToCompany
+				.reduce_sumVolumeCompany_SumFirstLastCloseCompany_sumCloseSumCounterCompany
+				.map_varYearCompany_dailyQuotCompany_fromCompanyToSector
+				.reduce_sumVolumes_sumVars_sumQuots
+				.map_avgSector
+				.sortBy(key);
+
+
+
+checkInputHS(line)												//filter dirty rows	
+	if(check_correctness_data(line))							//correct types 
+		return true
+	return false
+
+
+checkInputHSP(line)											//filter dirty rows	
+	if (check_correctness_data(line) &&						//correct types 
+			2008 <= date.year() && date.year() <= 2018):
+		return true
+	return false
+
+
+prepareValuesHS(line)								//take relevant fields from historical_stocks
+	company <- line.company
+	sector <- line.sector
+	
+	key <- line.ticker
+	value <- company,sector
+	EMIT(key,value)
+
+
+prepareValuesHSP(line)								//take relevant fields from historical_stock_prices
+	close <- line.close
+	volume <- line.volume
+	date <- line.date
+	
+	key <- line.ticker
+	value <- close,volume,date
+	EMIT(key, value)
+
+
+reorganizeValuesAfterJoin(tuple) 							//organize values for later computation
+	volume <- tuple.volume
+	firstDate <- tuple.date
+	lastDate <- tuple.date
+	firstClose <- tuple.close
+	lastClose <- tuple.close
+	close <- tuple.close
+	counterDays <- 1
+	company <- tuple.company
+	sector <- tuple.sector
+	
+	key <- tuple.ticker + tuple.year
+	value <- volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector
+	EMIT(key, value)
+
+
+reduce_sumVolumesTicker_findFirstLastClose(tuple1, tuple2)			//aggregate values on tickers
+	sumVolume <- tuple1.volume + tuple2.volume
+	firstDate <- MIN(tuple1.date, tuple2.date)
+	lastDate <- MAX(tuple1.date, tuple2.date)
+	firstClose <- close associated to firstDate
+	lastClose <- close associated to lastDate
+	sumClose <- tuple1.close + tupl2.close
+	counterDays <- tuple1.counterDays + tupl2.counterDays
+	company <- tuple1.company
+	sector <- tuple1.sector
+	
+	value <- sumVolume,firstDate,lastDate,firstClose,lastClose,sumClose,counterDays,company,sector
+	EMIT(value)
+
+
+
+map_fromTickerToCompany(tuple)					//change key to company year
+	sumVolume,firstClose,lastClose,sumClose,counterDays,sector <- extractValues(tuple)
+	
+	key <- tuple.company + tuple.year
+	value <- sumVolume,firstClose,lastClose,sumClose,counterDays,sector
+	EMIT(key,value)
+
+
+reduce_sumVolumeCompany_SumFirstLastCloseCompany_sumCloseSumCounterCompany(tuple1, tuple2)		//aggregate on company,year
+	sumVolumeCompany <- tuple1.volume + tuple2.volume
+	sumFirstCloses <- tuple1.firstClose + tuple2.firstClose
+	sumLastCloses <- tuple.lastClose + tuple2.lastClose
+	sumCloses <- tuple1.close + tuple2.close
+	smCountersDays <- tuple1.counterDays + tuple2.counterDays
+	sector <- tuple1.sector
+
+	value <- sumVolumeCompany,sumFirstCloses,sumLastCloses,sumCloses,sumCountersDays,sector
+	EMIT(value)
+	
+	
+map_varYearCompany_dailyQuotCompany_fromCompanyToSector(tuple)			//aggregate companies and change key to sector year
+	sumVolume <- tuple.sumVolumeCompany
+	varYear <- ((tuple.lastCloses - tuple.firstCloses) / tuple.firstCloses) * 100
+	dailyQuot <- tuple.sumCloses / tuple.sumCountersDays
+	counterCompanies <-1
+	
+	key <- tuple.sector + tuple.year
+	value <- sumVolume,varYear,dailyQuot,counterCompanies
+	EMIT(key,value) 
+
+
+reduce_sumVolumes_sumVars_sumQuots(tuple1, tuple2)						//aggregato on sector year
+	sumVolumes <- tuple1.volume + tuple2.volume
+	sumVars <- tuple1.varYear + tuple2.varYear
+	sumQuots <- tuple1.dailyQuot + tuple2.dailyQuot
+	counterCompanies <- tuple1.counterCompanies + tuple2.counterCompanies
+
+	value <- sumVolumes,sumVars,sumQuots,counterCompanies
+	EMIT(value)
+
+map_avgSector(tuple) 												//compute results
+	sectorYear <- tuple.key
+	avgVolumes <- tuple.sumVolumes / tuple.counterCompanies
+	avgVars <- tuple.sumVars / tuple.counterCompanies
+	avgDailyQuots <- tuple.sumQuots / tuple.counterCompanies
+	
+	result <- sectorYear,avgVolumes,avgVars,avgDailyQuots
+	EMIT(result) 
+	
+	
+	
+	
+	
+	
+	
+	

@@ -109,7 +109,7 @@ public class Ex2_spark_singleRow {
 
 			
 			PairFunction<	Tuple2<String, Tuple2<Tuple3<Float, Long, LocalDate>, Tuple2<String, String>>>,					//<ticker, [(close,volume,date),(company,sector)]>
-			String, Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>> 	reorganizeValuesAfterJoin1 = 			//<(ticker,year),(volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector)>
+			String, Tuple9<Long,LocalDate,LocalDate,Float,Float,Float,Integer,String,String>> 	reorganizeValuesAfterJoin = 			//<(ticker,year),(volume,firstDate,lastDate,firstClose,lastClose,close,counterDays,company,sector)>
 			tuple -> {
 				String ticker = tuple._1;
 				String year = tuple._2._1._3().getYear() + "";
@@ -250,9 +250,9 @@ public class Ex2_spark_singleRow {
 						Float avgDailyQuots = tuple._2._3() / counterCompanies;
 						Float roundedAvgDailyQuots = ((float)Math.round(avgDailyQuots*100))/100;
 						
-						String companyYear = tuple._1;
+						String sectorYear = tuple._1;
 						
-						return companyYear + COMMA + avgVolumes + COMMA + roundedAvgVars + "%" + COMMA + roundedAvgDailyQuots;
+						return sectorYear + COMMA + avgVolumes + COMMA + roundedAvgVars + "%" + COMMA + roundedAvgDailyQuots;
 					};
 
 			JavaPairRDD<String,Tuple2<String,String>> valuesHS = session.read().textFile(inputPathHS).javaRDD().filter(checkInputHS).mapToPair(prepareValuesHS);
@@ -261,7 +261,7 @@ public class Ex2_spark_singleRow {
 			
 					
 			JavaRDD<String> results = valuesHSP.join(valuesHS)
-												.mapToPair(reorganizeValuesAfterJoin1)
+												.mapToPair(reorganizeValuesAfterJoin)
 												.reduceByKey(reduce_sumVolumesTicker_findFirstLastClose)
 												.mapToPair(map_fromTickerToCompany)
 												.reduceByKey(reduce_sumVolumeCompany_SumFirstLastCloseCompany_sumCloseSumCounterCompany)

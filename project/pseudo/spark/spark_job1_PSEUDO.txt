@@ -27,9 +27,19 @@ POST-COND:
 	- document rows need to be sorted by descending "DELTA_QUOTATION_%" 
 	
 	
-checkline(line)												//filter dirty rows
-	check_correctness_data(line)							//correct types 
-	if (2008 <= date.year() && date.year() <= 2018):
+	
+main
+	inputData.checkline(line)
+				.prepareValues(line)
+				.reducer(tuple1, tuple2)
+				.produceResults(tuple)
+				.descendentSort(result.percentageChange)
+	
+
+
+checkline(line)												//filter dirty rows		 
+	if (check_correctness_data(line) &&						//correct types
+			2008 <= date.year() && date.year() <= 2018):
 		return true
 	return false
 	
@@ -69,13 +79,6 @@ produceResults(tuple)
 
 	result <- ticker, percentageChange, minPrice, maxPrice, avgVolume
 	EMIT(result)
-	
-main
-	inputData.checkline(line)
-				.prepareValues(line)
-				.reducer(tuple1, tuple2)
-				.produceResults(tuple)
-				.descendentSort(result.percentageChange)
 
 
 
