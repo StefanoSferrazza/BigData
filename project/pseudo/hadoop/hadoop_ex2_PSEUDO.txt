@@ -30,10 +30,10 @@ PRE-COND:
 POST-COND:
 	- output file needs to be a document, separated by commas, with 5 fields:
 		- SECTOR		String
-		- YEAR			String				
-		- avgVolume				Long		average annual volume of sector	
-		- DELTA_QUOTATION_%		String  	(Integer with %)	percentage change rounded of volume
-		- avgDailyClose			Long		average daily quotation of sector
+		- YEAR			String				between 2008-2018
+		- avgVolume				Long		average annual volume of sector	 reported in period 2008-2018
+		- DELTA_QUOTATION_%		String  	(Integer with %)	percentage change rounded of volume reported in period 2008-2018
+		- avgDailyClose			Long		average daily quotation of sector reported in period 2008-2018
 
 
 SEPARATOR_HSP = "historical_stock_prices";
