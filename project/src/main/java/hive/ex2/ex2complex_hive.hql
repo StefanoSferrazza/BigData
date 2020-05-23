@@ -85,7 +85,7 @@ ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT sector,
 	   year,
-       ROUND(AVG(totvolume_company), 2) as avg_volume,
+       cast(AVG(totvolume_company) as BIGINT) as avg_volume,
        ROUND(AVG(delta_quot), 2) as delta_quot,
        ROUND(AVG(avg_dailyquot), 2) as avg_dailyquot
 FROM company_quotationyear

@@ -19,9 +19,8 @@ import hadoop.ex2_basic.Ex2HSPMapper;
 
 /**
  * 
+ * Ex2 Companies BigData Project
  * 
- * 
- *
  */
 public class Ex2_Companies extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
@@ -35,7 +34,7 @@ public class Ex2_Companies extends Configured implements Tool{
 		
 		Configuration conf = getConf();
 		
-		/*JOIN*/
+		/*JOB JOIN*/
 		Job join = Job.getInstance(conf, "join");
 		join.setJarByClass(Ex2_Companies.class);
 

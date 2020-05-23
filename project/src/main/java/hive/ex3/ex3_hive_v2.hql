@@ -51,17 +51,6 @@ GROUP BY company, year;
 
 
 ---------- VERSION WITH YEARS AS DISTINCT PARAMETERS ----------
---DROP TABLE if exists company_quotationyear;
-
---CREATE TEMPORARY TABLE company_quotationyear
---AS
---SELECT company,
---	   year,
---       cast(((last_close - first_close)/first_close)*100 as BIGINT) as delta_quot
---FROM historical_stocks hs JOIN ticker_quotationyear tqy
---	 ON hs.ticker = tqy.ticker;
-
-
 DROP TABLE if exists ex3_hive;
 
 CREATE TABLE ex3_hive

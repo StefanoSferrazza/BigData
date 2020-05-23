@@ -8,9 +8,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 /**
  * 
+ * Company Reducer for Job2
  * 
- * 
- *
  */
 public class Ex2CompanyReducer_Companies extends Reducer<Text,Text,Text,Text>{
 
@@ -27,8 +26,6 @@ public class Ex2CompanyReducer_Companies extends Reducer<Text,Text,Text,Text>{
 			float companySumDailyCloses = 0;
 			long companyYearRows = 0;
 			
-//			String sector = "";
-			
 			for(Text value : values) {
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -42,7 +39,9 @@ public class Ex2CompanyReducer_Companies extends Reducer<Text,Text,Text,Text>{
 				}
 			}
 
+			/*calculate companyDeltaQuotation based on its definition*/
 			float companyDeltaQuotation = ((companySumLastCloses-companySumFirstCloses)/companySumFirstCloses)*100;
+			/*calculate companyAvgDailyClose based on its definition*/
 			float companyAvgDailyClose = companySumDailyCloses/companyYearRows;
 			
 			String[] keys = key.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");

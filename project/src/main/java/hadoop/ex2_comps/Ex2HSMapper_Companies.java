@@ -11,9 +11,8 @@ import utilities.Utilities;
 
 /**
  * 
+ * Mapper for Historical_Stocks
  * 
- * 
- *
  */
 public class Ex2HSMapper_Companies extends Mapper<LongWritable, Text, Text, Text>{
 
@@ -30,6 +29,7 @@ public class Ex2HSMapper_Companies extends Mapper<LongWritable, Text, Text, Text
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 							
+				/*check input correctness*/
 				if(tokens.length==5	&&
 	        			Utilities.inputExists(tokens[0]) &&	//ticker
 	        			Utilities.inputExists(tokens[2]) &&	//company

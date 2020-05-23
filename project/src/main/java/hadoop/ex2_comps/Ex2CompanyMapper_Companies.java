@@ -8,11 +8,8 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 /**
  * 
+ * Company Mapper for Job2
  * 
- * 
- * 
- * 
- *
  */
 public class Ex2CompanyMapper_Companies extends Mapper<Text,Text,Text,Text>{
 
@@ -23,7 +20,8 @@ public class Ex2CompanyMapper_Companies extends Mapper<Text,Text,Text,Text>{
 			String line = value.toString();
 			String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 
-			if(tokens.length==5)	//6)
+			/*check input correctness*/
+			if(tokens.length==5)
 				context.write(new Text(key.toString()), new Text(line));
 		}
 		catch(Exception e) {

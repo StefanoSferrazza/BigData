@@ -10,10 +10,8 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 /**
  * 
+ * Reducer for Job Join
  * 
- * 
- * 
- *
  */
 public class Ex2JoinReducer_Companies extends Reducer<Text, Text, Text, Text>{
 
@@ -90,7 +88,7 @@ public class Ex2JoinReducer_Companies extends Reducer<Text, Text, Text, Text>{
 				}
 		}
 
-		if(!company.equals("") && !sector.equals("")) {	//corrisponderebbe a dati non contenenti "sector" in "historical_stocks"
+		if(!company.equals("") && !sector.equals("")) {		//required to remove cases without sector AFTER join
 			for(Integer year : actionYearFirstClose.keySet()) {
 				float lastClose = actionYearLastClose.get(year);
 				float firstClose = actionYearFirstClose.get(year);
