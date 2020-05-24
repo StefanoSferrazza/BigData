@@ -1,3 +1,6 @@
+SET threshold = 10000;		-- example of threshold to define similarity with Euclidean distance
+
+
 
 DROP TABLE if exists ticker_firstlastdateyear;
 
@@ -95,29 +98,37 @@ FROM ( SELECT CONCAT ("{", CONCAT_WS(';', COLLECT_SET(c1.company)), "}") as comp
 
 
 
+DROP TABLE if exists ex3_hive_SimilQuots_tmp;
+
+CREATE TEMPORARY TABLE ex3_hive_SimilQuots_tmp
+AS
+SELECT t1.company,
+	   cast( SQRT(pow((t1.quot2016-t2.quot2016),2) + 
+	   		pow((t1.quot2017-t2.quot2017),2) +
+	   		pow((t1.quot2018-t2.quot2018),2))as BIGINT) as similQuot
+	  FROM ex3_hive_Singles t1 JOIN ex3_hive_Singles t2
+	  	   ON (t1.company != t2.company and
+       		   SQRT(pow((t1.quot2016-t2.quot2016),2)  + 
+	   		        pow((t1.quot2017-t2.quot2017),2) +
+	   		        pow((t1.quot2018-t2.quot2018),2)) >= '${hiveconf:threshold}');
+
+
+
 DROP TABLE if exists ex3_hive_SimilQuots;
 
 CREATE TEMPORARY TABLE ex3_hive_SimilQuots
 AS
-SELECT CONCAT ("{", CONCAT_WS(';', COLLECT_SET(tmp.company)), "}") as companies,
-	   cast(tmp.similQuot as STRING) as similQuot
-FROM (SELECT t1.company,
-	         SQRT(pow((t1.quot2016-t2.quot2016),2) + 
-	   		      pow((t1.quot2017-t2.quot2017),2) +
-	   		      pow((t1.quot2018-t2.quot2018),2)) as similQuot
-	  FROM ex3_hive_Singles t1 JOIN ex3_hive_Singles t2
-	  	   ON t1.company != t2.company
-      WHERE SQRT(pow((t1.quot2016-t2.quot2016),2)  + 
-	   		      pow((t1.quot2017-t2.quot2017),2) +
-	   		      pow((t1.quot2018-t2.quot2018),2)) >= 25
-	  ) as tmp
-GROUP BY tmp.similQuot;
+SELECT CONCAT ("{", CONCAT_WS(';', COLLECT_SET(company)), "}") as companies,
+	   cast(similQuot as STRING) as similQuot
+FROM ex3_hive_SimilQuots_tmp
+GROUP BY cast(similQuot as STRING);
 
 
 
 DROP TABLE if exists ex3_hive;
 
 CREATE TABLE ex3_hive
+ROW FORMAT DELIMITED FIELDS TERMINATED by ','
 AS
 SELECT *
 FROM ex3_hive_SameQuots
