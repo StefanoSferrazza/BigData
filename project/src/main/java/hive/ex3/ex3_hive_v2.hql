@@ -43,7 +43,7 @@ CREATE TEMPORARY TABLE company_quotationyear
 AS
 SELECT company,
 	   year,
-       cast (AVG(delta_quot) as INT) as delta_quot		 -- maybe change with FLOOR
+       cast (AVG(delta_quot) as INT) as delta_quot
 FROM historical_stocks hs JOIN ticker_quotationyear tqy
 	 ON hs.ticker = tqy.ticker
 GROUP BY company, year;
