@@ -117,6 +117,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 				}
 		}
 
+		/*populate the maps with the aggregated results from this iteration of the reduce method*/
 		for(Integer year : actionYearFirstClose.keySet()) {
 			float actionFirstClose = actionYearFirstClose.get(year);
 			float actionLastClose = actionYearLastClose.get(year);
@@ -142,7 +143,7 @@ public class Ex3JoinReducer extends Reducer<Text, Text, Text, Text>{
 
 
 	/**
-	 * Use cleanup method to avoid another MapReduce step
+	 * Use cleanup method to calculate annual variation for each company and avoid another MapReduce step
 	 */
 	@Override
 	protected void cleanup(Context context) throws IOException, InterruptedException {
