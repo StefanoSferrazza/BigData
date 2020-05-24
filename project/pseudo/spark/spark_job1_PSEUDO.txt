@@ -69,7 +69,7 @@ reducer(tuple1, tuple2)										//aggregate on ticker
 	counter <- tuple1.counter + tuple2.counter
 	
 	value <- firstDate,lastDate,firstClose,lastClose,minClose,maxClose,sumVolume,counter
-	EMIT()
+	EMIT(value)
 
 
 
