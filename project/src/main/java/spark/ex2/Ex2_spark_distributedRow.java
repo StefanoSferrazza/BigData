@@ -24,7 +24,7 @@ import scala.Tuple9;
 import utilities.Result_Ex1;
 import utilities.Utilities;
 
-public class Ex2_spark {
+public class Ex2_spark_distributedRow {
 
 	private static final String COMMA = ",";
 	

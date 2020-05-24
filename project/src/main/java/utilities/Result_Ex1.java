@@ -2,7 +2,9 @@ package utilities;
 
 import java.io.Serializable;
 
-
+/**
+ * Rappresenta il risultato dell'esercizio 1 come Comparable per ordinare l'ouput per valore della variazione percentuale decrescente
+ */
 public class Result_Ex1 implements Comparable<Result_Ex1>,Serializable{
 
 	/**

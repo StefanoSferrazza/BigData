@@ -9,6 +9,10 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.sql.SparkSession;
 
+/**
+ *  Questa classe mira alla pulizia del dataset "Historical_stock_prices.csv" da eventuali dati sporchi o assenti. Viene fatto per tutti i campi che vengono utilizzati
+ *  dai vari job sviluppati, nell'intervallo di date richiesto, ignorando eventuali dati sporchi che non siano rilevanti.
+ */
 public class CheckerHSP {
 	
 	private static final String COMMA = ",";
