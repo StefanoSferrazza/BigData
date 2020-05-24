@@ -2,12 +2,9 @@ package spark.ex2;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -19,9 +16,7 @@ import scala.Tuple2;
 import scala.Tuple3;
 import scala.Tuple4;
 import scala.Tuple6;
-import scala.Tuple7;
 import scala.Tuple9;
-import utilities.Result_Ex1;
 import utilities.Utilities;
 
 public class Ex2_spark_distributedRow {

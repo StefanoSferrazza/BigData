@@ -1,8 +1,6 @@
 package spark.ex1;
 
 import java.io.FileWriter;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 

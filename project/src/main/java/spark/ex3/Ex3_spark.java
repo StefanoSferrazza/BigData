@@ -2,11 +2,8 @@ package spark.ex3;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDate;
 
-import org.apache.hadoop.io.Text;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -14,19 +11,15 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.sql.SparkSession;
 
-import scala.Tuple1;
 import scala.Tuple2;
 import scala.Tuple3;
 import scala.Tuple5;
-import scala.Tuple6;
-import scala.Tuple9;
 import utilities.Utilities;
 
 public class Ex3_spark {
 
 	private static final String COMMA = ",";
 
-	private static final String SEMICOLON =";";
 	
 	public static void main(String[] args) throws IOException {
 
