@@ -32,8 +32,8 @@ public class Ex2HSMapper extends Mapper<LongWritable, Text, Text, Text>{
 
 				/*check input correctness*/
 				if(tokens.length==5	&&
-						Utilities.inputExists(tokens[0]) &&
-						Utilities.inputExists(tokens[3]) ) {
+						Utilities.inputExists(tokens[0]) &&		//ticker
+						Utilities.inputExists(tokens[3]) ) {	//sector
 
 					//<ticker, (historical_stock,sector)>						
 					context.write(new Text(tokens[0]), new Text(SEPARATOR_HS + COMMA + tokens[3]));

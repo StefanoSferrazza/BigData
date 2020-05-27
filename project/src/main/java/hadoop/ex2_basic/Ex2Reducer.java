@@ -28,13 +28,15 @@ public class Ex2Reducer extends Reducer<Text,Text,Text,Text>{
 	
 	@Override
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
-		try {			
+		try {
+			/*initialize*/
 			long sectorSumVolume = 0;
 			float sectorSumDeltaQuotation = 0;
 			float sectorSumDailyClose = 0;
 			long sectorYearRows = 0;
 			int counterRows = 0;
 
+			/*update*/
 			for(Text value : values) {
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");

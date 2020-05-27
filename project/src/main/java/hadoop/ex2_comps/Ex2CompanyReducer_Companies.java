@@ -20,17 +20,19 @@ public class Ex2CompanyReducer_Companies extends Reducer<Text,Text,Text,Text>{
 		
 		//	<(company,year), (sumVolume,lastClose,firstClose,sumDailyClose,yearRow,sector)>
 		try {
+			/*initialize*/
 			long companySumYearVolume = 0;
 			float companySumLastCloses = 0;
 			float companySumFirstCloses = 0;
 			float companySumDailyCloses = 0;
 			long companyYearRows = 0;
 			
+			/*update*/
 			for(Text value : values) {
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 				
-				if(tokens.length==5) {		//6) {
+				if(tokens.length==5) {
 					companySumYearVolume += Long.parseLong(tokens[0]);
 					companySumLastCloses += Float.parseFloat(tokens[1]);
 					companySumFirstCloses += Float.parseFloat(tokens[2]);
@@ -46,7 +48,7 @@ public class Ex2CompanyReducer_Companies extends Reducer<Text,Text,Text,Text>{
 			
 			String[] keys = key.toString().split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
 			
-//			<(sector,year), (companySumYearVolume,companyDeltaQuotation,companyAvgDailyClose)>
+		//	<(sector,year), (companySumYearVolume,companyDeltaQuotation,companyAvgDailyClose)>
 			context.write(new Text(keys[1] + COMMA + keys[2]), new Text(companySumYearVolume + COMMA + companyDeltaQuotation + COMMA + companyAvgDailyClose));// + COMMA + 1));		
 		}
 		catch(Exception e) {

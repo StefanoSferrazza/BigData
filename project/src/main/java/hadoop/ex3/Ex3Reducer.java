@@ -64,7 +64,9 @@ public class Ex3Reducer extends Reducer<Text,Text,Text,Text>{
 	}
 
 
-
+	/**
+	 * Use cleanup method to sort the map and produce the output result
+	 */
 	@Override
 	protected void cleanup(Context context) throws IOException, InterruptedException {
 		this.companiesNumbers = Utilities.sortByValue(companiesNumbers);
@@ -73,6 +75,9 @@ public class Ex3Reducer extends Reducer<Text,Text,Text,Text>{
 			Text companiesText = new Text(comps);
 			Text trend = new Text(this.companiesQuotations.get(comps));
 			Integer numberOfCompanies = companiesNumbers.get(comps);
+			//Text outputKey = new Text(companiesText.toString());
+
+			/*also add numberOfCompanies to output for better readability*/
 			Text outputKey = new Text(numberOfCompanies + COMMA + companiesText.toString());
 			context.write(outputKey, trend);
 		}

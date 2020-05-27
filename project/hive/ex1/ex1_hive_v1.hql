@@ -14,7 +14,7 @@ GROUP BY ticker;
 
 
 
----------- VERSION WITHOUT TEMPORARY TABLES ----------
+---------- MAIN VERSION: WITHOUT TEMPORARY TABLES ----------
 DROP TABLE if exists ex1_hive;
 
 CREATE TABLE ex1_hive
@@ -25,7 +25,7 @@ SELECT tfc.ticker as ticker,
 	   min_close,
 	   max_close,
 	   avg_volume
-FROM ( SELECT tfd.ticker as ticker,
+FROM ( SELECT tfd.ticker as ticker,				-- to get first_close
 	   	      hsp.close as first_close,
 	   		  min_close,
 	          max_close,
@@ -34,7 +34,7 @@ FROM ( SELECT tfd.ticker as ticker,
        JOIN historical_stock_prices hsp
 	 	    ON (tfd.ticker = hsp.ticker and tfd.first_date = hsp.day) 
 	 ) tfc
-JOIN ( SELECT tld.ticker as ticker,
+JOIN ( SELECT tld.ticker as ticker,				-- to get last close
 	          hsp.close as last_close
 	   FROM ticker_firstlastvalues tld 
 	   JOIN historical_stock_prices hsp

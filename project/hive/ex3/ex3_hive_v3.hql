@@ -12,7 +12,7 @@ GROUP BY ticker, year(day);
 
 
 
----------- VERSION V1 BUT WITH BETTER OUTPUT FORMAT ----------
+---------- VERSION V1 BUT WITH BETTER OUTPUT FORMAT TO PRODUCE RESULTS IN REPORT ----------
 DROP TABLE if exists ticker_quotationyear;
 
 CREATE TEMPORARY TABLE ticker_quotationyear

@@ -1,5 +1,4 @@
-SET threshold = 10000;		-- example of threshold to define similarity with Euclidean distance
-
+SET threshold = 5;		-- example of threshold to define similarity with Euclidean distance
 
 
 DROP TABLE if exists ticker_firstlastdateyear;
@@ -39,7 +38,8 @@ ON (first.ticker = last.ticker and first.year = last.year);
 
 
 
-DROP TABLE if exists company_quotationyear;
+DROP TABLE if exists company_quotationyear;    -- independent table because 
+											   --it is used more than once
 
 CREATE TEMPORARY TABLE company_quotationyear
 AS
@@ -83,7 +83,7 @@ SELECT cast(tmp.companies as STRING) as company,
        tmp.quot2016 as quot2016,
 	   tmp.quot2017 as quot2017,
 	   tmp.quot2018 as quot2018
-FROM ( SELECT CONCAT ("{", CONCAT_WS(';', COLLECT_SET(c1.company)), "}") as companies,
+FROM ( SELECT CONCAT_WS(';', COLLECT_SET(c1.company)) as companies,
 	   		  c1.delta_quot as quot2016,
 	          c2.delta_quot as quot2017,
 	          c3.delta_quot as quot2018
@@ -102,15 +102,18 @@ DROP TABLE if exists ex3_hive_SimilQuots_tmp;
 
 CREATE TEMPORARY TABLE ex3_hive_SimilQuots_tmp
 AS
-SELECT t1.company,
-	   cast( SQRT(pow((t1.quot2016-t2.quot2016),2) + 
-	   		pow((t1.quot2017-t2.quot2017),2) +
-	   		pow((t1.quot2018-t2.quot2018),2))as BIGINT) as similQuot
-	  FROM ex3_hive_Singles t1 JOIN ex3_hive_Singles t2
-	  	   ON (t1.company != t2.company and
-       		   SQRT(pow((t1.quot2016-t2.quot2016),2)  + 
-	   		        pow((t1.quot2017-t2.quot2017),2) +
-	   		        pow((t1.quot2018-t2.quot2018),2)) >= '${hiveconf:threshold}');
+SELECT t1.company as comp1,
+	   t2.company as comp2
+FROM ex3_hive_Singles t1 JOIN ex3_hive_Singles t2
+	 ON (
+         SQRT(pow((t1.quot2016-t2.quot2016),2)  + 
+	   		  pow((t1.quot2017-t2.quot2017),2) +
+	   		  pow((t1.quot2018-t2.quot2018),2)) = '${hiveconf:threshold}'
+	   	  or 
+	   	  SQRT(pow((t1.quot2016-t2.quot2016),2)  + 
+	   		  pow((t1.quot2017-t2.quot2017),2) +
+	   		  pow((t1.quot2018-t2.quot2018),2)) = '0')
+ORDER BY comp1,comp2;
 
 
 
@@ -118,10 +121,15 @@ DROP TABLE if exists ex3_hive_SimilQuots;
 
 CREATE TEMPORARY TABLE ex3_hive_SimilQuots
 AS
-SELECT CONCAT ("{", CONCAT_WS(';', COLLECT_SET(company)), "}") as companies,
-	   cast(similQuot as STRING) as similQuot
-FROM ex3_hive_SimilQuots_tmp
-GROUP BY cast(similQuot as STRING);
+SELECT DISTINCT CONCAT ("{", CONCAT_WS(';', temp.companies, "}")) as companies,
+	            CONCAT ("similarity = ", cast('${hiveconf:threshold}' as STRING)) as similQuot
+FROM 
+	( SELECT tmp.comp1 as company,
+	         COLLECT_SET(tmp.comp2) as companies
+	  FROM ex3_hive_SimilQuots_tmp tmp
+      GROUP BY tmp.comp1
+      HAVING count(*) > 2
+    ) temp;
 
 
 

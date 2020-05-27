@@ -30,13 +30,12 @@ public class Ex3HSPMapper extends Mapper<LongWritable, Text, Text, Text>{
 				String[] tokens = line.split(COMMA);
 
 				/*check input correctness*/
-				if(tokens.length==8) {
+				if(tokens.length==8 && Utilities.inputExists(tokens[7])) { //date
 					LocalDate date = LocalDate.parse(tokens[7]);
 
 					if(date.getYear()>=2016 && date.getYear()<=2018  &&
-	        				Utilities.inputExists(tokens[0]) &&
-	        				Utilities.inputExists(tokens[2]) &&
-	        				Utilities.inputExists(tokens[7])) {
+	        				Utilities.inputExists(tokens[0]) &&			 //ticker
+	        				Utilities.inputExists(tokens[2])) {			 //close
 						
 						Float.parseFloat(tokens[2]);
 

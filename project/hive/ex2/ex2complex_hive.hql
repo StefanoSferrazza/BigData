@@ -1,3 +1,6 @@
+
+---------- COMPLEX VERSION: CONSIDERING COMPANIES ----------
+
 DROP TABLE if exists ticker_firstlastdateyear;
 
 CREATE TEMPORARY TABLE ticker_firstlastdateyear

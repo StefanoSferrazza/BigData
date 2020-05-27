@@ -21,6 +21,13 @@ public class Utilities {
 		return !(input==null || input.isEmpty() || input.equals(" ") || input.equals("N/A"));
 	}
 
+	/**
+	 * It sorts a map in input by its values in decreasing order
+	 * @param <K>
+	 * @param <V>
+	 * @param map
+	 * @return map
+	 */
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         List<Entry<K, V>> list = new ArrayList<>(map.entrySet());
         list.sort(Entry.comparingByValue());

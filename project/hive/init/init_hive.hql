@@ -1,8 +1,11 @@
+
+---------- INITIALIZATION: it creates tables for input datasets ----------
+
 DROP TABLE if exists historical_stock_prices;
 
 CREATE TABLE historical_stock_prices (
         ticker STRING,
-        open FLOAT, --DECIMAL(15,5),
+        open FLOAT, --DECIMAL(15,5),	also tested with decimals
         close FLOAT, --DECIMAL(15,5),
         adj_close FLOAT, --DECIMAL(15,5),
         low_the FLOAT, --DECIMAL(15,5),

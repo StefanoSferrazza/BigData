@@ -12,7 +12,7 @@ GROUP BY ticker, year(day);
 
 
 
----------- quotation - PERSONAL VERSION: sum first_close and sum last_close, then delta_quot ----------
+---------- MAIN PERSONAL VERSION: quotation => sum first_close and sum last_close, then delta_quot ----------
 DROP TABLE if exists ticker_quotationyear;
 
 CREATE TEMPORARY TABLE ticker_quotationyear
@@ -21,7 +21,7 @@ SELECT first.ticker as ticker,
 	   first.year as year,     
 	   firstclose_ticker,
 	   lastclose_ticker
-FROM ( SELECT tfldy.ticker as ticker,
+FROM ( SELECT tfldy.ticker as ticker,				--
 	   		  tfldy.year as year,
 	   		  hsp.close as firstclose_ticker
 	    FROM ticker_firstlastdateyear tfldy JOIN historical_stock_prices hsp

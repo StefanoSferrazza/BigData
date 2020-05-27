@@ -5,6 +5,10 @@ import java.io.IOException;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
+
+/**
+ * Combiner 1 for Job2 Complex Version 
+ */
 public class Ex2CombinerCompany_withCompany extends Reducer<Text,Text,Text,Text>{
 
 	private static final String COMMA = ",";
@@ -12,11 +16,14 @@ public class Ex2CombinerCompany_withCompany extends Reducer<Text,Text,Text,Text>
 	public void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException{
 		//	<(company,year), (sumVolume,lastClose,firstClose,sumDailyClose,yearRow,sector)>
 		try {
+			/*initialize*/
 			long sumYearVolumeCompany = 0;
 			float sumLastCloses = 0;
 			float sumFirstCloses = 0;
 			float sumDailyCloses = 0;
 			long yearRowsEachTicker = 0;
+			
+			/*update*/
 			for(Text value : values) {
 				String line = value.toString();
 				String[] tokens = line.split(",(?=([^\"]*\"[^\"]*\")*[^\"]*$)");
@@ -28,7 +35,6 @@ public class Ex2CombinerCompany_withCompany extends Reducer<Text,Text,Text,Text>
 					yearRowsEachTicker += Long.parseLong(tokens[4]);
 				}
 			}
-			
 			
 			context.write(key, new Text(sumYearVolumeCompany + COMMA + sumLastCloses + COMMA + sumFirstCloses + COMMA + sumDailyCloses + COMMA + yearRowsEachTicker));
 

@@ -90,9 +90,9 @@ ex2Reducer(key, values)
 			update sectorSumVolume, sectorSumDeltaQuotation, sectorSumDailyClose,
 				   sectorYearRows, counterRows
 		
-			avgSumVolume <- sectorSumVolume/counterRows
-			avgDeltaQuot <- sectorSumDeltaQuotation/counterRows
-			avgDailyClose <- sectorSumDailyClose/sectorYearRows
+		avgSumVolume <- sectorSumVolume/counterRows
+		avgDeltaQuot <- sectorSumDeltaQuotation/counterRows
+		avgDailyClose <- sectorSumDailyClose/sectorYearRows
 		
-			EMIT((sector,year), (avgSumVolume,avgDeltaQuot,avgDailyClose))
+		EMIT((sector,year), (avgSumVolume,avgDeltaQuot,avgDailyClose))
 		

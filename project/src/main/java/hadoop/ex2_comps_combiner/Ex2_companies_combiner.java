@@ -31,8 +31,8 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 	public int run(String[] args) throws Exception {
 				
 		/*PATHS*/
-		Path inputHS = new Path(args[0]);
-		Path inputHSP = new Path(args[1]);
+		Path inputHSP = new Path(args[0]);
+		Path inputHS = new Path(args[1]);
 		Path temp1 = new Path("temp1");
 		Path temp2 = new Path("temp2");
 		Path output = new Path(args[2]);
@@ -40,12 +40,11 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 		Configuration conf = getConf();
 		
 		/*JOIN*/
-		@SuppressWarnings("deprecation")
-		Job join = new Job(conf, "join");
+		Job join = Job.getInstance(conf, "join");
 		join.setJarByClass(Ex2_companies_combiner.class);
 
-		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, Ex2HSMapper_Companies.class);
 		MultipleInputs.addInputPath(join, inputHSP,TextInputFormat.class, Ex2HSPMapper.class);
+		MultipleInputs.addInputPath(join, inputHS,TextInputFormat.class, Ex2HSMapper_Companies.class);
 		FileOutputFormat.setOutputPath(join, temp1);
 		
 		join.setReducerClass(Ex2JoinReducer_Companies.class);
@@ -62,8 +61,7 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 		
 		
 		/*JOB2 companies part*/
-		@SuppressWarnings("deprecation")
-		Job job2Companies = new Job(conf, "job2_companies_combiner");
+		Job job2Companies = Job.getInstance(conf, "job2_companies_combiner");
 		job2Companies.setJarByClass(Ex2_companies_combiner.class);
 		
 		FileInputFormat.setInputPaths(job2Companies, temp1);
@@ -87,10 +85,9 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 			return -1;
 		}
 
-		/*JOB2 sectors part*/
 		
-		@SuppressWarnings("deprecation")
-		Job job2Sectors = new Job(conf, "job2_sector_combiner");
+		/*JOB2 sectors part*/
+		Job job2Sectors = Job.getInstance(conf, "job2_sector_combiner");
 		job2Sectors.setJarByClass(Ex2_companies_combiner.class);
 		
 		FileInputFormat.setInputPaths(job2Sectors, temp2);
@@ -112,16 +109,14 @@ public class Ex2_companies_combiner extends Configured implements Tool{
 		if (! succ) {
 			System.out.println("Job2 sectors aggregation failed, exiting");
 			return -1;
-		}
-		
-				
+		}	
 		return 0;
 	}
 	
 	
 	public static void main(String[] args) throws Exception {
 		if (args.length != 3) {
-			System.out.println("Usage: Job2_companies .../historical_stocks.csv .../historical_stock_prices.csv .../RISULTATO_JOB2");
+			System.out.println("Usage: Job2_companies .../historical_stock_prices.csv .../historical_stocks.csv .../RISULTATO_JOB2");
 			System.exit(-1);
 		}
 		int res = ToolRunner.run(new Configuration(), new Ex2_companies_combiner(), args);

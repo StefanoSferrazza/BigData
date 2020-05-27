@@ -1,4 +1,8 @@
-DROP TABLE if exists ticker_sector;
+
+---------- BASIC VERSION: NOT CONSIDERING COMPANIES ----------
+
+DROP TABLE if exists ticker_sector;			-- independent table because 
+											--it is used more than once
 
 CREATE TEMPORARY TABLE ticker_sector
 AS

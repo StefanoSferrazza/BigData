@@ -17,7 +17,7 @@ import utilities.Utilities;
 public class Ex2HSMapper_Companies extends Mapper<LongWritable, Text, Text, Text>{
 
 	private static final String COMMA = ",";
-	private static final String SEPARATOR_HS = "historical_stock";
+	private static final String SEPARATOR_HS = "historical_stock";		//for the join
 
 	@Override
 	protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {

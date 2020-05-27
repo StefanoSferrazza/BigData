@@ -29,15 +29,14 @@ public class Ex1Mapper extends Mapper<LongWritable, Text, Text, Text> {
 			String[] tokens = value.toString().split(COMMA);
 			
 			/*check input correctness*/
-			if(tokens.length==8)  {
+			if(tokens.length==8 && Utilities.inputExists(tokens[7]))  {      //date
 				LocalDate date = LocalDate.parse(tokens[7]);
 				
 				/*filter only required records*/
 				if(date.getYear()>=2008 && date.getYear()<=2018 &&
 						Utilities.inputExists(tokens[0]) &&		//ticker
 						Utilities.inputExists(tokens[2]) &&		//close
-						Utilities.inputExists(tokens[6]) &&		//volume
-						Utilities.inputExists(tokens[7])) {	//date
+						Utilities.inputExists(tokens[6])) {		//volume	
 
 					Float.parseFloat(tokens[2]);
 					Long.parseLong(tokens[6]);

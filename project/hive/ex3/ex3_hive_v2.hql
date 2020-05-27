@@ -12,8 +12,9 @@ GROUP BY ticker, year(day);
 
 
 
---------- ALTERNATIVE VERSIONS ---------
----------- quotation - TEACHER VERSION: first delta quot per ticker, then avg for each company ----------
+--------- ALTERNATIVE VERSION ---------
+---------- PROFESSOR VERSION: quotation => first delta quot per ticker, then avg for each company ----------
+---------- VERSION WITH YEARS AS DISTINCT PARAMETERS ----------
 DROP TABLE if exists ticker_quotationyear;
 
 CREATE TEMPORARY TABLE ticker_quotationyear
@@ -50,7 +51,6 @@ GROUP BY company, year;
 
 
 
----------- VERSION WITH YEARS AS DISTINCT PARAMETERS ----------
 DROP TABLE if exists ex3_hive;
 
 CREATE TABLE ex3_hive

@@ -14,7 +14,7 @@ GROUP BY ticker;
 
 
 
----------- VERSION WITH TEMPORARY TABLES ----------
+---------- ALTERNATIVE VERSION: WITH TEMPORARY TABLES ----------
 DROP TABLE if exists ticker_firstclose;
 
 CREATE TEMPORARY TABLE ticker_firstclose
